@@ -1,0 +1,98 @@
+{
+  "started_at": "2026-11-17T13:53:55.916773+00:00",
+  "steps": [
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.yaml",
+        "--profile",
+        "tools",
+        "config",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "stdout": "{\n  \"name\": \"pf-techack\",\n  \"networks\": {\n    \"model\": {\n      \"name\": \"pf-techack_model\",\n      \"ipam\": {}\n    },\n    \"target\": {\n      \"name\": \"pf-techack_target\",\n      \"ipam\": {}\n    }\n  },\n  \"services\": {\n    \"juice-shop\": {\n      \"cpus\": 1,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"node\",\n          \"-e\",\n          \"require('http').get('http://127.0.0.1:3000/',r=\\u003e{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=\\u003eprocess.exit(1))\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 18,\n        \"start_period\": \"30s\"\n      },\n      \"image\": \"bkimminich/juice-shop:latest\",\n      \"init\": true,\n      \"mem_limit\": \"805306368\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 3000,\n          \"published\": \"3000\",\n          \"protocol\": \"tcp\"\n        }\n      ],\n      \"restart\": \"no\",\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ]\n    },\n    \"ollama\": {\n      \"cpus\": 3,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"environment\": {\n        \"LAB_MODEL\": \"qwen3:1.7b\",\n        \"OLLAMA_CONTEXT_LENGTH\": \"2048\",\n        \"OLLAMA_HOST\": \"0.0.0.0:11434\",\n        \"OLLAMA_KEEP_ALIVE\": \"2m\",\n        \"OLLAMA_MAX_LOADED_MODELS\": \"1\",\n        \"OLLAMA_NO_CLOUD\": \"1\",\n        \"OLLAMA_NUM_PARALLEL\": \"1\"\n      },\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"ollama\",\n          \"list\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 12,\n        \"start_period\": \"15s\"\n      },\n      \"image\": \"ollama/ollama:latest\",\n      \"mem_limit\": \"3221225472\",\n      \"networks\": {\n        \"model\": null\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 11434,\n          \"published\": \"11434\",\n          \"protocol\": \"tcp\"\n        }\n      ],\n      \"restart\": \"no\",\n      \"volumes\": [\n        {\n          \"type\": \"volume\",\n          \"source\": \"ollama-data\",\n          \"target\": \"/root/.ollama\",\n          \"volume\": {}\n        }\n      ]\n    },\n    \"tools\": {\n      \"profiles\": [\n        \"tools\"\n      ],\n      \"build\": {\n        \"context\": \"/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/docker/tools\",\n        \"dockerfile\": \"Dockerfile\"\n      },\n      \"cap_drop\": [\n        \"ALL\"\n      ],\n      \"command\": [\n        \"python3\",\n        \"--version\"\n      ],\n      \"entrypoint\": null,\n      \"mem_limit\": \"268435456\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"read_only\": true,\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"tmpfs\": [\n        \"/tmp\"\n      ]\n    }\n  },\n  \"volumes\": {\n    \"ollama-data\": {\n      \"name\": \"pf-techack_ollama-data\"\n    }\n  }\n}",
+      "stderr": "",
+      "seconds": 0.302
+    },
+    {
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ServerVersion}}"
+      ],
+      "returncode": 0,
+      "stdout": "29.4.3\n",
+      "stderr": "",
+      "seconds": 1.008
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.yaml",
+        "pull",
+        "juice-shop",
+        "ollama"
+      ],
+      "returncode": 0,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 366.016
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "bkimminich/juice-shop:latest"
+      ],
+      "returncode": 0,
+      "stdout": "[\n    {\n        \"Id\": \"sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n        \"RepoTags\": [\n            \"bkimminich/juice-shop:latest\"\n        ],\n        \"RepoDigests\": [\n            \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\"\n        ],\n        \"Comment\": \"buildkit.dockerfile.v0\",\n        \"Created\": \"2026-11-08T19:22:51.143075392Z\",\n        \"Config\": {\n            \"User\": \"65532\",\n            \"ExposedPorts\": {\n                \"3000/tcp\": {}\n            },\n            \"Env\": [\n                \"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\",\n                \"SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt\"\n            ],\n            \"Entrypoint\": [\n                \"/nodejs/bin/node\"\n            ],\n            \"Cmd\": [\n                \"/juice-shop/build/app.js\"\n            ],\n            \"WorkingDir\": \"/juice-shop\",\n            \"Labels\": {\n                \"maintainer\": \"Bjoern Kimminich <bjoern.kimminich@owasp.org>\",\n                \"org.opencontainers.image.authors\": \"Bjoern Kimminich <bjoern.kimminich@owasp.org>\",\n                \"org.opencontainers.image.created\": \"”2026-11-08T19:09:22Z”\",\n                \"org.opencontainers.image.description\": \"Probably the most modern and sophisticated insecure web application\",\n                \"org.opencontainers.image.documentation\": \"https://help.owasp-juice.shop\",\n                \"org.opencontainers.image.licenses\": \"MIT\",\n                \"org.opencontainers.image.revision\": \"266448a\",\n                \"org.opencontainers.image.source\": \"https://github.com/juice-shop/juice-shop\",\n                \"org.opencontainers.image.title\": \"OWASP Juice Shop\",\n                \"org.opencontainers.image.url\": \"https://owasp-juice.shop\",\n                \"org.opencontainers.image.vendor\": \"Open Worldwide Application Security Project\",\n                \"org.opencontainers.image.version\": \"20.4.0-SNAPSHOT\"\n            },\n            \"ArgsEscaped\": true\n        },\n        \"Architecture\": \"arm64\",\n        \"Os\": \"linux\",\n        \"Size\": 119500630,\n        \"RootFS\": {\n            \"Type\": \"layers\",\n            \"Layers\": [\n                \"sha256:e842bc95a0a8664498b7881e537b5929e419d590f5a9954fb7f81c73c20fc6c7\",\n                \"sha256:621c35e751a51a9a9dc3e80aa0b7fe8be2a93402ea6ccd307d30852cd7776cda\",\n                \"sha256:b64fe4bb89ff075efc03878811052cbaf4f9dd891aed968e9ed6993fedf1f4a7\",\n                \"sha256:b5764396d8d3f88c6c91b8e97022f147ec721afcf85710d96775922e0df881af\",\n                \"sha256:275a30dd8ce958b21daa9ad962c6fbc09f98306ee2f486b65c9075dc257b1412\",\n                \"sha256:4d049f83d9cf21d1f5cc0e11deaf36df02790d0e60c1a3829538fb4b61685368\",\n                \"sha256:af5aa97ebe6ce1604747ec1e21af7136ded391bcabe4acef882e718a87c86bcc\",\n                \"sha256:6f1cdceb6a3146f0ccb986521156bef8a422cdbb0863396f7f751f575ba308f4\",\n                \"sha256:bd3cdfae1d3fdd83a2231d608969b38b82349777c2fff9a7c12d54f8ac5c9b38\",\n                \"sha256:4cde6b0bb6f50a5f255eef7b2a42162c661cf776b803225dcac9a659e396bb6b\",\n                \"sha256:ad51d0769d16ba578106a177987dfe3d2e02c1668c852b795b2f6b024068242a\",\n                \"sha256:187cfc6d1e3e8a40a5e64653bcd3239c140807dcf1c09e48021178705a5a6139\",\n                \"sha256:0762a1f6557d1e88a761ab05aa7f65a10dc0e559913ea13befb873d907e1a396\",\n                \"sha256:50a5575df19e16694e9b7bfca79ef13cfce85faab4b0585ff197a078a952b007\",\n                \"sha256:948af73b9b4f49fa4e0009269c2f4a5b174fb02c4485b13ab7f6d0c705d49966\",\n                \"sha256:91213e6dc2fda431a0de4541602a933c7a48206a0bf487217fa681260fccdc23\",\n                \"sha256:7b57942929394e731b49e8f1863a4da2cbd1b9fda48d9f1e75a0a28b2d89d01a\",\n                \"sha256:7578331450f7cd6e1f6f28caf2ce9af93ea935a049132bb63ed523dcbda068e4\",\n                \"sha256:323c2be748e4417f7ab7b05b33d6c1a52df0788e779143555109ddcd5325c76c\",\n                \"sha256:fcb0c313318aac64dde0e0574b4df3394902929eb62d43e8b6c47ec4562f170d\",\n                \"sha256:30884b21b6a1362fbcdb60743280a138148b6d0ac50a3f8ee3e9f213b371c9e7\",\n                \"sha256:9ffefd8aa36964c944d48396a4467cb69274c8ccf3cc294a0a5a24c171685c08\",\n                \"sha256:dac3f2ca23eff476e07505286236fdc3e72936f2f44ba01c7be432c061706a8e\",\n                \"sha256:08c5cc921cb56f5e7885bb2c4ac4f0f8925eefd4c2275502f2ec8f5f87ccc36f\"\n            ]\n        },\n        \"Metadata\": {\n            \"LastTagTime\": \"2026-11-17T13:55:04.212656012Z\"\n        },\n        \"Descriptor\": {\n            \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n            \"digest\": \"sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n            \"size\": 1609\n        },\n        \"Identity\": {\n            \"Pull\": [\n                {\n                    \"Repository\": \"docker.io/bkimminich/juice-shop\"\n                }\n            ]\n        }\n    }\n]\n",
+      "stderr": "",
+      "seconds": 0.24
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "ollama/ollama:latest"
+      ],
+      "returncode": 0,
+      "stdout": "[\n    {\n        \"Id\": \"sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n        \"RepoTags\": [\n            \"ollama/ollama:latest\"\n        ],\n        \"RepoDigests\": [\n            \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\"\n        ],\n        \"Comment\": \"buildkit.dockerfile.v0\",\n        \"Created\": \"2026-11-09T23:19:01.142590508Z\",\n        \"Config\": {\n            \"ExposedPorts\": {\n                \"11434/tcp\": {}\n            },\n            \"Env\": [\n                \"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\",\n                \"LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64\",\n                \"NVIDIA_DRIVER_CAPABILITIES=compute,utility\",\n                \"NVIDIA_VISIBLE_DEVICES=all\",\n                \"OLLAMA_HOST=0.0.0.0:11434\"\n            ],\n            \"Entrypoint\": [\n                \"/bin/ollama\"\n            ],\n            \"Cmd\": [\n                \"serve\"\n            ],\n            \"Labels\": {\n                \"org.opencontainers.image.version\": \"24.04\"\n            },\n            \"ArgsEscaped\": true\n        },\n        \"Architecture\": \"arm64\",\n        \"Os\": \"linux\",\n        \"Size\": 2872629797,\n        \"RootFS\": {\n            \"Type\": \"layers\",\n            \"Layers\": [\n                \"sha256:107ffca6dcd3fc87a7bed8c062f5ddc0d6a4b107205c82c0b49efdb7c1aff967\",\n                \"sha256:2f65c6ce107825653e9578e9e227b2193e87a657052ce5ec0a067a947c3ed079\",\n                \"sha256:4fcb942b1771f41442c98089ede147f4e25353465a7e67c1c55c15981af14068\",\n                \"sha256:0ef65f28c5079130054c3300c9817e958b65e1d2a2358523aa6d0a5575e27c55\"\n            ]\n        },\n        \"Metadata\": {\n            \"LastTagTime\": \"2026-11-17T14:00:02.538129887Z\"\n        },\n        \"Descriptor\": {\n            \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n            \"digest\": \"sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n            \"size\": 647\n        },\n        \"Identity\": {\n            \"Pull\": [\n                {\n                    \"Repository\": \"docker.io/ollama/ollama\"\n                }\n            ]\n        }\n    }\n]\n",
+      "stderr": "",
+      "seconds": 0.028
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.yaml",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.lock.json",
+        "up",
+        "-d",
+        "--wait",
+        "--wait-timeout",
+        "240",
+        "juice-shop",
+        "ollama"
+      ],
+      "returncode": 1,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 203.317
+    }
+  ],
+  "action": "up",
+  "error": "Comando falhou; consulte a saída no terminal.",
+  "success": false,
+  "finished_at": "2026-11-17T14:03:26.832036+00:00"
+}

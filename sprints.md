@@ -2,6 +2,13 @@
 
 ## Objetivo
 
+> **Adaptação informada pelo grupo em 17/11/2026:** o projeto será executado nas
+> máquinas pessoais da dupla, alternativa autorizada segundo o usuário. Juice Shop
+> e LLM ficam no Docker do Mac de Luiz; Kali em VM na máquina da dupla. Essa
+> substituição do kit deve constar no relatório final. As referências ao kit abaixo
+> preservam o contexto original do enunciado. Veja `docs/laboratorio.md` e
+> `docs/sprint-1-status.md` para configuração e pendências reais.
+
 Construir, no kit de laboratório da disciplina, um ambiente reproduzível com OWASP Juice Shop, um LLM local e um agente supervisionado; realizar três investigações de segurança; entregar código, configurações, registros, relatório e vídeo.
 
 Este guia organiza os requisitos do enunciado **AF - Tecnologias Hackers 26-2.pdf**. A divisão em sprints, os nomes dos arquivos e as escolhas de implementação sugeridas abaixo são propostas de organização, não exigências adicionais do professor.
@@ -31,18 +38,18 @@ Este guia organiza os requisitos do enunciado **AF - Tecnologias Hackers 26-2.pd
 
 ### Tarefas
 
-- [ ] Definir onde cada componente será executado no kit: Juice Shop, Kali, modelo local e agente.
+- [x] Definir onde cada componente será executado (adaptado às máquinas pessoais): Juice Shop, modelo e futuro agente no Mac; Kali na VM da dupla.
 - [ ] Registrar máquinas, sistemas, endereços, portas e versões utilizadas.
-- [ ] Instalar e iniciar uma instância local do OWASP Juice Shop.
+- [x] Instalar e iniciar uma instância local do OWASP Juice Shop (HTTP e healthcheck validados em 17/11/2026).
 - [ ] Confirmar que o Kali consegue acessar essa instância.
-- [ ] Instalar Ollama ou solução equivalente e disponibilizar um LLM local para integração.
-- [ ] Escolher o modelo conforme os recursos do kit; Qwen3 4B quantizado é um exemplo do enunciado, não uma obrigação.
-- [ ] Confirmar que o programa poderá consultar o modelo pela interface local escolhida.
-- [ ] Preparar as ferramentas que poderão ser integradas ao agente.
-- [ ] Definir o endereço e a porta autorizados para os testes.
-- [ ] Documentar um procedimento de reinício ou restauração do Juice Shop a um estado conhecido.
-- [ ] Executar esse procedimento e verificar que o estado esperado foi recuperado.
-- [ ] Registrar os comandos e configurações necessários para reproduzir a instalação e a inicialização.
+- [x] Instalar Ollama ou solução equivalente e disponibilizar um LLM local para integração.
+- [x] Escolher o modelo conforme os recursos: Qwen3 1.7B quantizado como opção inicial para o Mac M1/8 GB; desempenho ainda a validar.
+- [x] Confirmar que o programa poderá consultar o modelo pela interface local escolhida (geração pela API local registrada).
+- [x] Preparar as ferramentas que poderão ser integradas ao agente (curl, Nmap e Python no contêiner auxiliar; Kali ainda a validar).
+- [x] Definir o endereço e a porta autorizados para os testes: `172.16.50.247:3000` na LAN WannaCry escolhida em 17/11/2026; publicação e acesso pelo Kali pendentes.
+- [x] Documentar um procedimento de reinício ou restauração do Juice Shop a um estado conhecido.
+- [x] Executar esse procedimento e verificar que o estado esperado foi recuperado (novo contêiner, mesma imagem, marcador removido e zero desafios resolvidos).
+- [x] Registrar os comandos e configurações necessários para reproduzir a instalação e a inicialização.
 
 ### Saídas sugeridas
 

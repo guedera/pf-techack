@@ -1,0 +1,10 @@
+{
+  "services": {
+    "juice-shop": {
+      "image": "bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809"
+    },
+    "ollama": {
+      "image": "ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592"
+    }
+  }
+}
