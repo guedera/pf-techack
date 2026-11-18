@@ -1,60 +1,30 @@
-# Sprint 2 — planejamento humano original
+# Planejamento dos testes — versão original da dupla
 
-**Status: não preenchido.**
+Feito sem apoio do LLM, conforme a seção 3 do roteiro.
 
-Este arquivo contém somente uma estrutura preparada com apoio de IA. Não contém
-hipóteses nem estratégias de investigação. Os integrantes deverão preencher o
-conteúdo analítico com suas próprias observações, sem auxílio de LLM, conforme o
-enunciado. Não apresentar este modelo em branco como planejamento concluído.
+- Integrantes: Luiz Miguel e Guilherme Guedes
 
-- Integrantes: [preencher]
-- Data e horário do planejamento, com fuso: [preencher]
-- Alvo do laboratório: `http://172.16.50.247:3000`
-- Estado inicial da aplicação e registros correspondentes: [preencher]
-- Responsável por registrar as observações: [preencher]
+## Análise inicial do ambiente
 
-## Observações iniciais da dupla
-
-[Registrar as observações feitas pelo grupo, com data e referências às evidências
-que motivaram as escolhas abaixo.]
+Nenhuma anomalia identificada.
 
 ## Investigação 1
 
-- **Título e aspecto investigado:** [preencher]
-- **Hipótese inicial:** [preencher]
-- **Motivação e relevância para a disciplina:** [preencher]
-- **Estratégia de teste proposta pelo grupo:** [preencher]
-- **Ferramentas consideradas e justificativa:** [preencher]
-- **Evidências necessárias:** [preencher]
-- **Critérios para sustentar ou rejeitar a hipótese:** [preencher]
-- **Condições para encerrar o teste ou declarar resultado inconclusivo:** [preencher]
+- **Aspecto da aplicação investigado:** Tratamento de login
+- **Hipótese inicial:** Suspeitamos que o site nao faz o handler adequado para evitar vazar informacoes de usuario na tela de login
+- **Ferramentas que podem contribuir:** DevTools, BurpSuite ou WireShark.
+- **Evidências necessárias para sustentar as conclusões:** Credenciais aparecer no payload ou cabecalho da requisicao.
 
 ## Investigação 2
 
-- **Título e aspecto investigado:** [preencher]
-- **Hipótese inicial:** [preencher]
-- **Motivação e relevância para a disciplina:** [preencher]
-- **Estratégia de teste proposta pelo grupo:** [preencher]
-- **Ferramentas consideradas e justificativa:** [preencher]
-- **Evidências necessárias:** [preencher]
-- **Critérios para sustentar ou rejeitar a hipótese:** [preencher]
-- **Condições para encerrar o teste ou declarar resultado inconclusivo:** [preencher]
+- **Aspecto da aplicação investigado:** Controle de acesso inseguro
+- **Hipótese inicial:** Suspeitamos que o site permitia acessar o carrinho de outros usuarios
+- **Ferramentas que podem contribuir:** BurpSuite ou DevTools
+- **Evidências necessárias para sustentar as conclusões:** Mudar o ID do carrinho do usuario (dentro do local-database) para outro ID e verificar se mudou os itens do carrinho.
 
 ## Investigação 3
 
-- **Título e aspecto investigado:** [preencher]
-- **Hipótese inicial:** [preencher]
-- **Motivação e relevância para a disciplina:** [preencher]
-- **Estratégia de teste proposta pelo grupo:** [preencher]
-- **Ferramentas consideradas e justificativa:** [preencher]
-- **Evidências necessárias:** [preencher]
-- **Critérios para sustentar ou rejeitar a hipótese:** [preencher]
-- **Condições para encerrar o teste ou declarar resultado inconclusivo:** [preencher]
-
-## Preservação da versão original
-
-Após preencher e revisar entre os integrantes, registrar a versão datada,
-preferencialmente em um commit próprio, antes de solicitar revisão ao modelo.
-Guardar as contribuições posteriores da IA em outro documento, sem substituir
-as hipóteses e estratégias originais. Alterar o status acima somente depois que
-o planejamento estiver completo.
+- **Aspecto da aplicação investigado:** Exposição de Dados Sensíveis
+- **Hipótese inicial:** Suspeitamos que o site vazava informacoes importantes e credenciais por algum acesso indevido.
+- **Ferramentas que podem contribuir:** BurpSuite
+- **Evidências necessárias para sustentar as conclusões:** testar acesso por "/robots.txt" e verificar possiveis caminhos para informacoes de credenciais e informacoes importantes.
