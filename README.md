@@ -37,8 +37,13 @@ Não remove o volume do modelo. As imagens baixadas são fixadas por digest em
 
 **Estado atual:** inicialização, inferência local, ferramentas e restauração
 validadas em 17/11/2026 pelos registros de sucesso de `up` e `reset`.
-LAN WannaCry: `.env` local preparado para `172.16.50.247:3000`; falta aplicar
-essa configuração no Docker, validar o acesso pelo Kali e completar seu inventário.
+LAN WannaCry: `172.16.50.247:3000` respondeu HTTP 200 no Mac e no script do Kali.
+Interface no Firefox do Kali confirmada após desativar o proxy do navegador.
+O critério funcional da Sprint 1 foi atendido; faltam trazer o JSON original e a
+captura da aplicação aberta no Kali e completar seu inventário. O
+[print do JSON do Kali](evidencias/sprint-1/kali-check-json.png) já está incluído nas
+[evidências da Sprint 1](evidencias/sprint-1/README.md). Próxima etapa: preencher
+[o planejamento humano](docs/plano-humano.md), ainda em branco, antes da revisão pela IA.
 O problema inicial do caminho do Node foi corrigido. Consulte
 [o registro da preparação](docs/sprint-1-status.md).
 

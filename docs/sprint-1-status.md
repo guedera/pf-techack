@@ -1,6 +1,6 @@
 # Registro de preparação — Sprint 1
 
-Data: 17/11/2026. Estado: **ambiente do Mac validado; conexão pelo Kali pendente**.
+Data: 17/11/2026. Estado: **critério funcional da Sprint 1 atendido; organização das evidências e inventário pendentes**.
 
 ## Decisões
 
@@ -9,7 +9,7 @@ Data: 17/11/2026. Estado: **ambiente do Mac validado; conexão pelo Kali pendent
 - VM Kali na máquina do outro integrante; mesma LAN WannaCry, isolada no laboratório
   conforme informado pelo usuário.
 - Publicação inicialmente validada em loopback. `.env` ajustado para a LAN WannaCry,
-  `172.16.50.247:3000`; aplicação no Docker e acesso pelo Kali ainda pendentes.
+  `172.16.50.247:3000`; HTTP validado no Mac e pelo script no Kali, conforme evidências abaixo.
 - Modelo inicial Qwen3 1.7B quantizado para avaliar viabilidade com 8 GB.
 - Agente planejado para o Mac, com implementação na Sprint 3.
 
@@ -48,10 +48,13 @@ Data: 17/11/2026. Estado: **ambiente do Mac validado; conexão pelo Kali pendent
 - [x] Executar `python3 scripts/lab.py reset --confirm` e confirmar a restauração do servidor.
 - [ ] Limpar os dados do site ou usar uma nova sessão privada antes dos próximos testes.
 - [x] Definir LAN ou VPN e registrar IP/porta do alvo autorizado: LAN WannaCry, `172.16.50.247:3000`.
-- [ ] Aplicar o novo vínculo de porta no Docker e verificar HTTP pelo IP da LAN.
-- [ ] Executar `kali-check` na VM e trazer o JSON e a captura para o repositório.
+- [x] Aplicar o novo vínculo de porta no Docker e verificar HTTP pelo IP da LAN.
+- [x] Executar `kali-check` na VM: captura enviada pelo usuário mostra HTTP 200 e sucesso.
+- [x] Confirmar a interface no Firefox do Kali: usuário informou acesso após desativar o proxy.
+- [x] Adicionar o print original do JSON do Kali em `evidencias/sprint-1/kali-check-json.png`.
+- [ ] Copiar o JSON original do Kali e uma captura da aplicação aberta para o repositório.
 - [ ] Completar inventário da máquina da dupla, versão do Kali e integrantes.
-- [x] Atualizar as tarefas em `sprints.md` com base nos registros locais; manter as pendências de rede/Kali abertas.
+- [x] Atualizar as tarefas em `sprints.md` com base nos registros locais e na confirmação do usuário; manter pendências de documentação abertas.
 
 ## Primeira execução no terminal do usuário
 
@@ -89,7 +92,7 @@ agente supervisionado, que ainda não foi implementado.
   curl `7.88.1`, Nmap `7.93` e Python do contêiner auxiliar `3.11.2`.
   A imagem Juice Shop permanece fixada pelo digest do lock, apesar do nome SNAPSHOT.
 - O endereço validado nesses registros é `http://127.0.0.1:3000`, apenas no Mac.
-  A conexão da VM Kali da dupla ainda não foi comprovada.
+  A conexão da VM Kali foi validada posteriormente na LAN, conforme seção abaixo.
 
 ## Preparação do acesso pela LAN
 
@@ -102,7 +105,7 @@ nos comandos desta sessão. O alvo autorizado para os testes pela LAN
 é exclusivamente `http://172.16.50.247:3000`; os demais serviços e dispositivos
 da rede ficam fora do escopo. A API Ollama permanece em `127.0.0.1:11434`.
 
-Essa alteração de arquivo ainda precisa ser aplicada pelo terminal do usuário:
+O usuário aplicou a configuração; os comandos para reaplicá-la são:
 
 ```bash
 docker compose -f compose.yaml -f compose.lock.json up -d --no-deps --pull never --wait juice-shop
@@ -118,3 +121,27 @@ python3 scripts/lab.py kali-check --target http://172.16.50.247:3000
 
 Preservar o registro gerado no Kali e confirmar a aplicação no navegador. Se o
 Mac trocar de rede ou receber outro IP, atualizar `.env` antes de recriar o serviço.
+
+## Diagnóstico do navegador no Kali
+
+O registro local `evidencias/sprint-1/20261117T142522280487Z-check.json` tem
+`success: true` e confirma HTTP 200 no IP da LAN, além da inferência local.
+O usuário também enviou uma captura do JSON produzido no Kali: GET para
+`http://172.16.50.247:3000/`, HTTP 200, 9.986 bytes, duração de 0,027 s e
+`success: true`. curl, Nmap e Python retornaram código zero na verificação de
+versão. A captura original está em
+[kali-check-json.png](../evidencias/sprint-1/kali-check-json.png), adicionada em
+18/11/2026. O arquivo JSON original do Kali ainda precisa ser copiado para este
+repositório; a imagem não foi convertida em um registro JSON reconstruído.
+
+O HTTP direto funcionava, mas a página não abria no Firefox. Em seguida, o usuário
+confirmou que a dupla desativou o proxy do navegador e conseguiu abrir a aplicação.
+O script desativa proxies (`ProxyHandler({})`), o que explica a diferença de
+comportamento entre o diagnóstico direto e o navegador com proxy configurado.
+Não foi identificado qual proxy estava em uso. Não foi necessário alterar
+NAT/bridge ou desativar o firewall.
+
+O critério funcional da Sprint 1 está atendido: acesso pelo Kali, inferência local
+e restauração do Juice Shop. Permanecem pendentes a cópia do JSON original do Kali,
+a captura da aplicação aberta e o complemento do inventário da dupla. O próximo
+trabalho é registrar o planejamento humano da Sprint 2, antes de revisão pela IA.

@@ -140,8 +140,9 @@ O arquivo pode ser grande; não o inclua no Git.
 **Sessão de 17/11/2026:** a dupla mudou para a LAN do laboratório WannaCry,
 informada como isolada pelo usuário. O Mac foi observado com IP `172.16.50.247`
 na interface ativa `en0`, e o `.env` local já foi ajustado.
-O endereço pretendido é `http://172.16.50.247:3000`; ainda é necessário aplicar o
-Compose e confirmar a conexão pelo Kali. Os comandos abaixo usam esse IP;
+O endereço `http://172.16.50.247:3000` já respondeu HTTP 200 no Mac e no script
+do Kali; o usuário confirmou que a interface abriu no Firefox após desativar o
+proxy do navegador. Os comandos abaixo usam esse IP;
 atualize-o ao reproduzir o ambiente em outra rede.
 
 No Mac, veja o IPv4 da interface ativa em Ajustes do Sistema → Rede. Se o Wi-Fi
