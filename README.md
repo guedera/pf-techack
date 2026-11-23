@@ -51,6 +51,23 @@ As instruções de recursos, acesso da dupla, ferramentas, versões e solução 
 problemas estão em [docs/laboratorio.md](docs/laboratorio.md).
 O planejamento completo está em [sprints.md](sprints.md).
 
+## Agente supervisionado (Sprint 3)
+
+O agente (`scripts/agente.py`) integra o modelo local a duas ferramentas
+delimitadas (`http_request` no Juice Shop e `tcp_scan` de reconhecimento). O
+modelo propõe uma ação, a dupla autoriza, modifica ou rejeita, a ferramenta roda
+só se autorizada e o resultado volta ao modelo. O alvo é travado no Juice Shop
+autorizado e tudo é gravado em `evidencias/investigacao-<id>/registro.jsonl`.
+
+```bash
+python3 scripts/agente.py --id 01 --plano docs/plano-humano.md   # objetivo vindo do plano
+python3 scripts/agente.py --id 01 --objetivo "texto livre"        # ou objetivo digitado
+python3 scripts/valida_agente.py   # valida ferramentas e modelo (não é investigação)
+```
+
+Detalhes, limites e verificações em [docs/agente.md](docs/agente.md). Testes
+offline: `python3 -m unittest discover -s tests`.
+
 O planejamento inicial das investigações (Sprint 2) deverá ser escrito pela dupla
 sem apoio do LLM, conforme o enunciado. Os diagnósticos desta sprint apenas
 validam a infraestrutura.

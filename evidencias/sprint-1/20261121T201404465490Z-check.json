@@ -1,0 +1,33 @@
+{
+  "started_at": "2026-11-21T20:13:49.357347+00:00",
+  "steps": [
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.yaml",
+        "-f",
+        "/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/compose.lock.json",
+        "--profile",
+        "tools",
+        "config",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "stdout": "{\n  \"name\": \"pf-techack\",\n  \"networks\": {\n    \"model\": {\n      \"name\": \"pf-techack_model\",\n      \"ipam\": {}\n    },\n    \"target\": {\n      \"name\": \"pf-techack_target\",\n      \"ipam\": {}\n    }\n  },\n  \"services\": {\n    \"juice-shop\": {\n      \"cpus\": 1,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"/nodejs/bin/node\",\n          \"-e\",\n          \"require('http').get('http://127.0.0.1:3000/',r=\\u003e{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=\\u003eprocess.exit(1))\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 18,\n        \"start_period\": \"30s\"\n      },\n      \"image\": \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n      \"init\": true,\n      \"mem_limit\": \"805306368\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"172.16.50.247\",\n          \"target\": 3000,\n          \"published\": \"3000\",\n          \"protocol\": \"tcp\"\n        }\n      ],\n      \"restart\": \"no\",\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ]\n    },\n    \"ollama\": {\n      \"cpus\": 3,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"environment\": {\n        \"LAB_MODEL\": \"qwen3:1.7b\",\n        \"OLLAMA_CONTEXT_LENGTH\": \"2048\",\n        \"OLLAMA_HOST\": \"0.0.0.0:11434\",\n        \"OLLAMA_KEEP_ALIVE\": \"2m\",\n        \"OLLAMA_MAX_LOADED_MODELS\": \"1\",\n        \"OLLAMA_NO_CLOUD\": \"1\",\n        \"OLLAMA_NUM_PARALLEL\": \"1\"\n      },\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"ollama\",\n          \"list\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 12,\n        \"start_period\": \"15s\"\n      },\n      \"image\": \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n      \"mem_limit\": \"3221225472\",\n      \"networks\": {\n        \"model\": null\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 11434,\n          \"published\": \"11434\",\n          \"protocol\": \"tcp\"\n        }\n      ],\n      \"restart\": \"no\",\n      \"volumes\": [\n        {\n          \"type\": \"volume\",\n          \"source\": \"ollama-data\",\n          \"target\": \"/root/.ollama\",\n          \"volume\": {}\n        }\n      ]\n    },\n    \"tools\": {\n      \"profiles\": [\n        \"tools\"\n      ],\n      \"build\": {\n        \"context\": \"/Users/luizmiguelmoraesberredo/Documents/INSPER/7-semestre/TecHack/pf-techack/docker/tools\",\n        \"dockerfile\": \"Dockerfile\"\n      },\n      \"cap_drop\": [\n        \"ALL\"\n      ],\n      \"command\": [\n        \"python3\",\n        \"--version\"\n      ],\n      \"entrypoint\": null,\n      \"mem_limit\": \"268435456\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"read_only\": true,\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"tmpfs\": [\n        \"/tmp\"\n      ]\n    }\n  },\n  \"volumes\": {\n    \"ollama-data\": {\n      \"name\": \"pf-techack_ollama-data\"\n    }\n  }\n}",
+      "stderr": "",
+      "seconds": 0.093
+    },
+    {
+      "url": "http://172.16.50.247:3000/",
+      "method": "GET",
+      "request": null
+    }
+  ],
+  "action": "check",
+  "error": "<urlopen error timed out>",
+  "success": false,
+  "finished_at": "2026-11-21T20:14:04.465088+00:00"
+}

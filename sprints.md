@@ -87,22 +87,22 @@ As três investigações possuem hipóteses, estratégias, ferramentas possívei
 
 ### Tarefas
 
-- [ ] Escolher a linguagem e uma arquitetura que todos os integrantes consigam explicar.
-- [ ] Implementar a comunicação com o modelo local.
-- [ ] Integrar no mínimo duas ferramentas, sendo pelo menos uma capaz de interagir diretamente com o Juice Shop.
-- [ ] Definir os parâmetros aceitos e os limites de cada ferramenta.
-- [ ] Implementar a entrada de um objetivo de investigação.
-- [ ] Fazer o modelo analisar o histórico disponível e propor uma ferramenta, seus parâmetros e a justificativa da ação.
-- [ ] Exibir a proposta antes da execução e permitir ao grupo **autorizar, modificar ou rejeitar**.
-- [ ] Exigir aprovação também para a versão modificada de uma ação.
-- [ ] Executar apenas ações autorizadas e devolver o resultado ao modelo.
-- [ ] Solicitar a interpretação do resultado e permitir que a próxima proposta considere as evidências anteriores.
-- [ ] Permitir que o grupo registre sua avaliação do resultado e encerre a investigação.
-- [ ] Registrar falhas de execução e tratar respostas inválidas do modelo sem executar ações não validadas.
-- [ ] Aplicar limites de tempo e de saída das ferramentas; preservar o resultado completo nos registros quando o conteúdo enviado ao modelo for reduzido.
-- [ ] Restringir o destino das ferramentas ao Juice Shop autorizado, incluindo o tratamento de redirecionamentos HTTP.
-- [ ] Evitar acesso irrestrito ao terminal: disponibilizar operações delimitadas com validação de parâmetros.
-- [ ] Implementar o registro completo das interações e decisões relevantes.
+- [x] Escolher a linguagem e uma arquitetura que todos os integrantes consigam explicar.
+- [x] Implementar a comunicação com o modelo local.
+- [x] Integrar no mínimo duas ferramentas, sendo pelo menos uma capaz de interagir diretamente com o Juice Shop.
+- [x] Definir os parâmetros aceitos e os limites de cada ferramenta.
+- [x] Implementar a entrada de um objetivo de investigação.
+- [x] Fazer o modelo analisar o histórico disponível e propor uma ferramenta, seus parâmetros e a justificativa da ação.
+- [x] Exibir a proposta antes da execução e permitir ao grupo **autorizar, modificar ou rejeitar**.
+- [x] Exigir aprovação também para a versão modificada de uma ação.
+- [x] Executar apenas ações autorizadas e devolver o resultado ao modelo.
+- [x] Solicitar a interpretação do resultado e permitir que a próxima proposta considere as evidências anteriores.
+- [x] Permitir que o grupo registre sua avaliação do resultado e encerre a investigação.
+- [x] Registrar falhas de execução e tratar respostas inválidas do modelo sem executar ações não validadas.
+- [x] Aplicar limites de tempo e de saída das ferramentas; preservar o resultado completo nos registros quando o conteúdo enviado ao modelo for reduzido.
+- [x] Restringir o destino das ferramentas ao Juice Shop autorizado, incluindo o tratamento de redirecionamentos HTTP.
+- [x] Evitar acesso irrestrito ao terminal: disponibilizar operações delimitadas com validação de parâmetros.
+- [x] Implementar o registro completo das interações e decisões relevantes.
 
 Uma implementação possível é um programa Python com integração ao Ollama e duas ferramentas delimitadas baseadas em `curl` e Nmap. Essa escolha é opcional e deve ser justificada pelo grupo conforme o plano de testes.
 
@@ -121,13 +121,13 @@ JSONL é uma opção prática para os registros, mas o formato fica a critério 
 
 ### Verificações
 
-- [ ] Uma ação rejeitada não executa a ferramenta.
-- [ ] Uma ação modificada executa apenas os parâmetros finais autorizados.
-- [ ] Uma proposta para um destino fora do escopo é bloqueada antes de qualquer contato com esse destino.
-- [ ] As duas ferramentas integradas funcionam no laboratório.
-- [ ] O resultado de uma ferramenta retorna ao modelo e influencia a proposta seguinte.
-- [ ] Uma falha de ferramenta ou resposta inválida não interrompe o registro nem provoca execução indevida.
-- [ ] Os registros permitem reconstruir uma sessão de ponta a ponta.
+- [x] Uma ação rejeitada não executa a ferramenta.
+- [x] Uma ação modificada executa apenas os parâmetros finais autorizados.
+- [x] Uma proposta para um destino fora do escopo é bloqueada antes de qualquer contato com esse destino.
+- [x] As duas ferramentas integradas funcionam no laboratório.
+- [x] O resultado de uma ferramenta retorna ao modelo e influencia a proposta seguinte.
+- [x] Uma falha de ferramenta ou resposta inválida não interrompe o registro nem provoca execução indevida.
+- [x] Os registros permitem reconstruir uma sessão de ponta a ponta.
 
 ### Saídas sugeridas
 
