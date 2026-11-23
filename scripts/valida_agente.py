@@ -70,6 +70,9 @@ def c_model_proposal():
     t = time.monotonic()
     raw = ag.model_generate(sysp, prompt)
     prop = ag.extract_json(raw)
+    if not isinstance(prop, dict) or prop.get("tool") not in ag.TOOLS or not isinstance(prop.get("params"), dict):
+        raise ValueError("Proposta inválida: " + raw[:300])
+    ag.validate_tool_params(prop["tool"], prop["params"])
     out = {"seconds": round(time.monotonic() - t, 1), "parsed": bool(prop)}
     if isinstance(prop, dict):
         out["tool"] = prop.get("tool")
@@ -88,7 +91,9 @@ def c_model_interpret():
         "Objetivo: enumerar a API.\nAção: http_request GET /rest/products/search\n"
         "Resultado (prévia):\n{}\n\nInterprete como JSON.".format(prev),
         num_predict=220)
-    parsed = ag.extract_json(raw) or {}
+    parsed = ag.extract_json(raw)
+    if not isinstance(parsed, dict) or not isinstance(parsed.get("interpretation"), str) or not parsed["interpretation"].strip() or parsed.get("hypothesis") not in ("suporta", "refuta", "inconclusivo"):
+        raise ValueError("Interpretação inválida: " + raw[:300])
     return {"hypothesis": parsed.get("hypothesis"),
             "interpretation": (parsed.get("interpretation") or raw)[:300]}
 
@@ -107,3 +112,4 @@ stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
 path = out_dir / (stamp + "-validacao.json")
 path.write_text(json.dumps(rec, indent=2, ensure_ascii=False) + "\n")
 print("\nsucesso={}  registro={}".format(rec["success"], path))
+raise SystemExit(0 if rec["success"] else 1)

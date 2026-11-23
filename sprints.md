@@ -1,5 +1,27 @@
 # Sprints — Avaliação Final de Tecnologias Hackers
 
+## Revisão de fechamento — 23/11/2026
+
+O checklist abaixo inclui marcações históricas e não substitui a evidência de execução.
+O planejamento humano já foi registrado em `5191db0`. O agente foi corrigido e
+passou em 29 testes offline. O laboratório e as integrações foram validados em
+23/11/2026; falta executar as três investigações finais supervisionadas.
+
+- [x] Preservar registros antigos e produzir resumos com reavaliação das conclusões.
+- [x] Corrigir histórico do agente, escopo TCP, validação, justificativas e separação de sessões.
+- [x] Preparar plano revisado com autoria assistida declarada.
+- [x] Produzir análise crítica e versão de trabalho do relatório técnico.
+- [x] Preparar roteiro do vídeo e instruções de retomada.
+- [ ] Dupla registrar suas decisões reais sobre as sugestões da revisão.
+- [x] Iniciar serviços e guardar a validação real da nova versão do agente.
+- [ ] Executar e concluir três investigações com controles adequados e supervisão humana.
+- [ ] Consolidar os novos resultados no relatório e conferir a versão renderizada de 4–6 páginas.
+- [ ] Gravar vídeo de até 10 minutos e conferir o pacote de entrega.
+
+Instruções operacionais: `docs/proximos-passos.md`. A versão de trabalho do relatório
+está em `docs/relatorio-tecnico.md`; ela não deve ser apresentada como resultado de
+experimentos que ainda não foram executados.
+
 ## Objetivo
 
 > **Adaptação informada pelo grupo em 17/11/2026:** o projeto será executado nas

@@ -23,7 +23,7 @@ alvos. A API Ollama é um componente de apoio à integração.
 | Ollama | Docker no Mac | `http://127.0.0.1:11434` | Volume `ollama-data` com os modelos |
 | curl, Nmap e Python | Contêiner auxiliar no Mac | Juice Shop via `http://juice-shop:3000` | Contêiner descartável |
 | Kali Linux | VM na máquina da dupla | Acessa o IP privado do Mac após configurar a rede | Gerenciada pela dupla |
-| Agente supervisionado | Planejado para o Mac na Sprint 3 | API local do Ollama e ferramentas delimitadas | Ainda não implementado |
+| Agente supervisionado | Implementado para o host do laboratório | API local do Ollama e ferramentas delimitadas | Código em `scripts/agente.py`; evidências em JSONL |
 
 Juice Shop/ferramentas e Ollama usam redes Docker separadas. Nenhum contêiner
 recebe acesso ao socket Docker ou arquivos pessoais do host. A separação de redes
@@ -214,7 +214,8 @@ docker compose run --rm tools python3 --version
 
 O contêiner é não privilegiado; uma futura integração de Nmap deverá usar modos
 compatíveis, como conexão TCP (`-sT`), com destino e porta delimitados. As
-ferramentas ainda não estão integradas a um agente. A seleção definitiva das
+ferramentas desse contêiner não são as usadas pelo agente atual, que implementa
+HTTP e conexão TCP diretamente em Python. A seleção definitiva das
 ferramentas de investigação cabe à dupla após o planejamento humano da Sprint 2.
 
 ## 5. Restauração verificável

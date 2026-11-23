@@ -43,7 +43,7 @@ O critério funcional da Sprint 1 foi atendido; faltam trazer o JSON original e 
 captura da aplicação aberta no Kali e completar seu inventário. O
 [print do JSON do Kali](evidencias/sprint-1/kali-check-json.png) já está incluído nas
 [evidências da Sprint 1](evidencias/sprint-1/README.md). Próxima etapa: preencher
-[o planejamento humano](docs/plano-humano.md), ainda em branco, antes da revisão pela IA.
+[o planejamento humano](docs/plano-humano.md), posteriormente registrado no commit `5191db0`.
 O problema inicial do caminho do Node foi corrigido. Consulte
 [o registro da preparação](docs/sprint-1-status.md).
 
@@ -68,6 +68,21 @@ python3 scripts/valida_agente.py   # valida ferramentas e modelo (não é invest
 Detalhes, limites e verificações em [docs/agente.md](docs/agente.md). Testes
 offline: `python3 -m unittest discover -s tests`.
 
-O planejamento inicial das investigações (Sprint 2) deverá ser escrito pela dupla
-sem apoio do LLM, conforme o enunciado. Os diagnósticos desta sprint apenas
-validam a infraestrutura.
+## Retomada em 23/11/2026
+
+O plano original já está registrado. O agente corrigido passou em 29 testes offline.
+Em 23/11/2026, o laboratório subiu com sucesso e a validação real confirmou HTTP,
+TCP, bloqueio de destino externo, proposta em JSON e interpretação pelo modelo.
+Os três registros históricos não sustentam confirmação ou rejeição das hipóteses.
+Suas conclusões foram reavaliadas em resumos separados, sem alterar os JSONL.
+
+- [Passos para concluir a entrega](docs/proximos-passos.md)
+- [Plano revisado com apoio de IA](docs/plano-revisado.md)
+- [Análise crítica baseada nas evidências existentes](docs/analise-critica.md)
+- [Relatório técnico — versão de trabalho](docs/relatorio-tecnico.md)
+- [Roteiro do vídeo](docs/roteiro-video.md)
+
+Cada nova sessão gera `registro-<sessao>.jsonl`. Justificativas e avaliação humana
+são obrigatórias. A ferramenta TCP permite somente a porta do Juice Shop,
+e o histórico inclui evidências e correções humanas. O laboratório está pronto; o
+próximo marco é executar as três sessões com decisões humanas reais.

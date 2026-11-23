@@ -30,7 +30,7 @@ não é uma sequência fixa de comandos.
     (inclui `Set-Cookie`) e corpo. Não segue redirecionamentos (o 3xx volta para
     análise); 4xx/5xx também voltam como resposta.
   - `tcp_scan` — TCP connect no host do alvo (reconhecimento). `params`: `ports`
-    (`"3000"`, `"1-1024"`, `"80,443"`; máximo 100 portas).
+    (somente a porta do Juice Shop configurada no `.env`).
 - **Escopo travado:** o alvo vem do `.env` e passa por `validate_target` (só
   loopback/LAN/VPN privada). Toda requisição é reconstruída e tem host/porta
   conferidos contra o alvo **antes** de qualquer contato; `tcp_scan` só usa o
@@ -41,7 +41,7 @@ não é uma sequência fixa de comandos.
 
 ## Registro (JSONL)
 
-`evidencias/investigacao-<id>/registro.jsonl`, um evento por linha, com fases:
+`evidencias/investigacao-<id>/registro-<sessao>.jsonl`, um evento por linha, com fases:
 `objetivo`, `proposta`, `supervisao` (decisão + parâmetros propostos e finais +
 justificativa humana), `execucao`, `erro_ferramenta`, `interpretacao`, `decisao`
 (avaliação da dupla) e `conclusao`. Ações rejeitadas e falhas também entram, o
@@ -78,6 +78,14 @@ python3 scripts/valida_agente.py
 | Saída completa preservada quando a prévia é reduzida | `Log`; `test_full_output_preserved_in_log` |
 
 ## Limitações conhecidas (para o relatório)
+
+Revisão de 23/11/2026: os registros antigos permanecem intactos. Novas sessões usam
+UUID no nome e nos eventos. Objetivos placeholder e tokens literais são rejeitados;
+justificativas, avaliações e conclusões não podem ficar vazias. A próxima proposta
+recebe a prévia do resultado e a avaliação humana. O corpo guardado tem teto de
+200 KB, com `truncated` indicando corte; portanto, não é necessariamente a resposta
+integral do servidor. Os 28 testes offline passaram, mas a validação real desta versão
+ainda deve ser registrada. Não afirmar que o novo comportamento foi medido em produção.
 
 - `qwen3:1.7b` é pequeno: pode devolver JSON malformado ou propor ações pouco
   úteis. O agente trata isso sem executar nada e deixa a decisão com a dupla.

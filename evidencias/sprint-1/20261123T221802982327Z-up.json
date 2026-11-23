@@ -1,0 +1,705 @@
+{
+  "started_at": "2026-11-23T22:09:20.431658+00:00",
+  "steps": [
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "--profile",
+        "tools",
+        "config",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "stdout": "{\n  \"name\": \"pf-techack\",\n  \"networks\": {\n    \"model\": {\n      \"name\": \"pf-techack_model\",\n      \"ipam\": {}\n    },\n    \"target\": {\n      \"name\": \"pf-techack_target\",\n      \"ipam\": {}\n    }\n  },\n  \"services\": {\n    \"juice-shop\": {\n      \"restart\": \"no\",\n      \"cpus\": 1,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"image\": \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n      \"init\": true,\n      \"mem_limit\": \"805306368\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"/nodejs/bin/node\",\n          \"-e\",\n          \"require('http').get('http://127.0.0.1:3000/',r=\\u003e{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=\\u003eprocess.exit(1))\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 18,\n        \"start_period\": \"30s\"\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 3000,\n          \"published\": \"3000\",\n          \"protocol\": \"tcp\"\n        }\n      ]\n    },\n    \"ollama\": {\n      \"restart\": \"no\",\n      \"cpus\": 3,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"environment\": {\n        \"LAB_MODEL\": \"qwen3:1.7b\",\n        \"OLLAMA_CONTEXT_LENGTH\": \"2048\",\n        \"OLLAMA_HOST\": \"0.0.0.0:11434\",\n        \"OLLAMA_KEEP_ALIVE\": \"2m\",\n        \"OLLAMA_MAX_LOADED_MODELS\": \"1\",\n        \"OLLAMA_NO_CLOUD\": \"1\",\n        \"OLLAMA_NUM_PARALLEL\": \"1\"\n      },\n      \"image\": \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n      \"mem_limit\": \"3221225472\",\n      \"networks\": {\n        \"model\": null\n      },\n      \"volumes\": [\n        {\n          \"type\": \"volume\",\n          \"source\": \"ollama-data\",\n          \"target\": \"/root/.ollama\",\n          \"volume\": {}\n        }\n      ],\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"ollama\",\n          \"list\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 12,\n        \"start_period\": \"15s\"\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 11434,\n          \"published\": \"11434\",\n          \"protocol\": \"tcp\"\n        }\n      ]\n    },\n    \"tools\": {\n      \"profiles\": [\n        \"tools\"\n      ],\n      \"cap_drop\": [\n        \"ALL\"\n      ],\n      \"command\": [\n        \"python3\",\n        \"--version\"\n      ],\n      \"entrypoint\": null,\n      \"mem_limit\": \"268435456\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"read_only\": true,\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"tmpfs\": [\n        \"/tmp\"\n      ],\n      \"build\": {\n        \"context\": \"/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/docker/tools\",\n        \"dockerfile\": \"Dockerfile\"\n      }\n    }\n  },\n  \"volumes\": {\n    \"ollama-data\": {\n      \"name\": \"pf-techack_ollama-data\"\n    }\n  }\n}",
+      "stderr": "",
+      "seconds": 0.106
+    },
+    {
+      "command": [
+        "docker",
+        "info",
+        "--format",
+        "{{.ServerVersion}}"
+      ],
+      "returncode": 0,
+      "stdout": "29.9.3\n",
+      "stderr": "",
+      "seconds": 0.178
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "pull",
+        "juice-shop",
+        "ollama"
+      ],
+      "returncode": 0,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 363.621
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809"
+      ],
+      "returncode": 0,
+      "stdout": "[\n    {\n        \"Id\": \"sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n        \"RepoTags\": [\n            \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\"\n        ],\n        \"RepoDigests\": [\n            \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\"\n        ],\n        \"Comment\": \"buildkit.dockerfile.v0\",\n        \"Created\": \"2026-11-08T19:22:51.143075392Z\",\n        \"Config\": {\n            \"User\": \"65532\",\n            \"ExposedPorts\": {\n                \"3000/tcp\": {}\n            },\n            \"Env\": [\n                \"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\",\n                \"SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt\"\n            ],\n            \"Entrypoint\": [\n                \"/nodejs/bin/node\"\n            ],\n            \"Cmd\": [\n                \"/juice-shop/build/app.js\"\n            ],\n            \"WorkingDir\": \"/juice-shop\",\n            \"Labels\": {\n                \"maintainer\": \"Bjoern Kimminich <bjoern.kimminich@owasp.org>\",\n                \"org.opencontainers.image.authors\": \"Bjoern Kimminich <bjoern.kimminich@owasp.org>\",\n                \"org.opencontainers.image.created\": \"”2026-11-08T19:09:22Z”\",\n                \"org.opencontainers.image.description\": \"Probably the most modern and sophisticated insecure web application\",\n                \"org.opencontainers.image.documentation\": \"https://help.owasp-juice.shop\",\n                \"org.opencontainers.image.licenses\": \"MIT\",\n                \"org.opencontainers.image.revision\": \"266448a\",\n                \"org.opencontainers.image.source\": \"https://github.com/juice-shop/juice-shop\",\n                \"org.opencontainers.image.title\": \"OWASP Juice Shop\",\n                \"org.opencontainers.image.url\": \"https://owasp-juice.shop\",\n                \"org.opencontainers.image.vendor\": \"Open Worldwide Application Security Project\",\n                \"org.opencontainers.image.version\": \"20.4.0-SNAPSHOT\"\n            },\n            \"ArgsEscaped\": true\n        },\n        \"Architecture\": \"arm64\",\n        \"Os\": \"linux\",\n        \"Size\": 534878477,\n        \"RootFS\": {\n            \"Type\": \"layers\",\n            \"Layers\": [\n                \"sha256:e842bc95a0a8664498b7881e537b5929e419d590f5a9954fb7f81c73c20fc6c7\",\n                \"sha256:621c35e751a51a9a9dc3e80aa0b7fe8be2a93402ea6ccd307d30852cd7776cda\",\n                \"sha256:b64fe4bb89ff075efc03878811052cbaf4f9dd891aed968e9ed6993fedf1f4a7\",\n                \"sha256:b5764396d8d3f88c6c91b8e97022f147ec721afcf85710d96775922e0df881af\",\n                \"sha256:275a30dd8ce958b21daa9ad962c6fbc09f98306ee2f486b65c9075dc257b1412\",\n                \"sha256:4d049f83d9cf21d1f5cc0e11deaf36df02790d0e60c1a3829538fb4b61685368\",\n                \"sha256:af5aa97ebe6ce1604747ec1e21af7136ded391bcabe4acef882e718a87c86bcc\",\n                \"sha256:6f1cdceb6a3146f0ccb986521156bef8a422cdbb0863396f7f751f575ba308f4\",\n                \"sha256:bd3cdfae1d3fdd83a2231d608969b38b82349777c2fff9a7c12d54f8ac5c9b38\",\n                \"sha256:4cde6b0bb6f50a5f255eef7b2a42162c661cf776b803225dcac9a659e396bb6b\",\n                \"sha256:ad51d0769d16ba578106a177987dfe3d2e02c1668c852b795b2f6b024068242a\",\n                \"sha256:187cfc6d1e3e8a40a5e64653bcd3239c140807dcf1c09e48021178705a5a6139\",\n                \"sha256:0762a1f6557d1e88a761ab05aa7f65a10dc0e559913ea13befb873d907e1a396\",\n                \"sha256:50a5575df19e16694e9b7bfca79ef13cfce85faab4b0585ff197a078a952b007\",\n                \"sha256:948af73b9b4f49fa4e0009269c2f4a5b174fb02c4485b13ab7f6d0c705d49966\",\n                \"sha256:91213e6dc2fda431a0de4541602a933c7a48206a0bf487217fa681260fccdc23\",\n                \"sha256:7b57942929394e731b49e8f1863a4da2cbd1b9fda48d9f1e75a0a28b2d89d01a\",\n                \"sha256:7578331450f7cd6e1f6f28caf2ce9af93ea935a049132bb63ed523dcbda068e4\",\n                \"sha256:323c2be748e4417f7ab7b05b33d6c1a52df0788e779143555109ddcd5325c76c\",\n                \"sha256:fcb0c313318aac64dde0e0574b4df3394902929eb62d43e8b6c47ec4562f170d\",\n                \"sha256:30884b21b6a1362fbcdb60743280a138148b6d0ac50a3f8ee3e9f213b371c9e7\",\n                \"sha256:9ffefd8aa36964c944d48396a4467cb69274c8ccf3cc294a0a5a24c171685c08\",\n                \"sha256:dac3f2ca23eff476e07505286236fdc3e72936f2f44ba01c7be432c061706a8e\",\n                \"sha256:08c5cc921cb56f5e7885bb2c4ac4f0f8925eefd4c2275502f2ec8f5f87ccc36f\"\n            ]\n        },\n        \"Metadata\": {\n            \"LastTagTime\": \"2026-11-23T22:10:18.383309054Z\"\n        },\n        \"Descriptor\": {\n            \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n            \"digest\": \"sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n            \"size\": 1609\n        },\n        \"Identity\": {\n            \"Pull\": [\n                {\n                    \"Repository\": \"docker.io/bkimminich/juice-shop\"\n                }\n            ]\n        }\n    }\n]\n",
+      "stderr": "",
+      "seconds": 0.034
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592"
+      ],
+      "returncode": 0,
+      "stdout": "[\n    {\n        \"Id\": \"sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n        \"RepoTags\": [\n            \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\"\n        ],\n        \"RepoDigests\": [\n            \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\"\n        ],\n        \"Comment\": \"buildkit.dockerfile.v0\",\n        \"Created\": \"2026-11-09T23:19:01.142590508Z\",\n        \"Config\": {\n            \"ExposedPorts\": {\n                \"11434/tcp\": {}\n            },\n            \"Env\": [\n                \"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\",\n                \"LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64\",\n                \"NVIDIA_DRIVER_CAPABILITIES=compute,utility\",\n                \"NVIDIA_VISIBLE_DEVICES=all\",\n                \"OLLAMA_HOST=0.0.0.0:11434\"\n            ],\n            \"Entrypoint\": [\n                \"/bin/ollama\"\n            ],\n            \"Cmd\": [\n                \"serve\"\n            ],\n            \"Labels\": {\n                \"org.opencontainers.image.version\": \"24.04\"\n            },\n            \"ArgsEscaped\": true\n        },\n        \"Architecture\": \"arm64\",\n        \"Os\": \"linux\",\n        \"Size\": 7213320094,\n        \"RootFS\": {\n            \"Type\": \"layers\",\n            \"Layers\": [\n                \"sha256:107ffca6dcd3fc87a7bed8c062f5ddc0d6a4b107205c82c0b49efdb7c1aff967\",\n                \"sha256:2f65c6ce107825653e9578e9e227b2193e87a657052ce5ec0a067a947c3ed079\",\n                \"sha256:4fcb942b1771f41442c98089ede147f4e25353465a7e67c1c55c15981af14068\",\n                \"sha256:0ef65f28c5079130054c3300c9817e958b65e1d2a2358523aa6d0a5575e27c55\"\n            ]\n        },\n        \"Metadata\": {\n            \"LastTagTime\": \"2026-11-23T22:15:24.222634042Z\"\n        },\n        \"Descriptor\": {\n            \"mediaType\": \"application/vnd.oci.image.index.v1+json\",\n            \"digest\": \"sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n            \"size\": 647\n        },\n        \"Identity\": {\n            \"Pull\": [\n                {\n                    \"Repository\": \"docker.io/ollama/ollama\"\n                }\n            ]\n        }\n    }\n]\n",
+      "stderr": "",
+      "seconds": 0.025
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "up",
+        "-d",
+        "--wait",
+        "--wait-timeout",
+        "240",
+        "juice-shop",
+        "ollama"
+      ],
+      "returncode": 0,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 5.912
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "exec",
+        "-T",
+        "ollama",
+        "ollama",
+        "pull",
+        "qwen3:1.7b"
+      ],
+      "returncode": 0,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 130.485
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "build",
+        "tools"
+      ],
+      "returncode": 0,
+      "stdout": null,
+      "stderr": null,
+      "seconds": 13.972
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "run",
+        "--rm",
+        "--no-deps",
+        "tools",
+        "curl",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "15",
+        "--output",
+        "/dev/null",
+        "http://juice-shop:3000/"
+      ],
+      "returncode": 0,
+      "stdout": "",
+      "stderr": " Container pf-techack-tools-run-733fc1e519d4 Creating \n Container pf-techack-tools-run-733fc1e519d4 Created \n",
+      "seconds": 0.53
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "--profile",
+        "tools",
+        "config",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "stdout": "{\n  \"name\": \"pf-techack\",\n  \"networks\": {\n    \"model\": {\n      \"name\": \"pf-techack_model\",\n      \"ipam\": {}\n    },\n    \"target\": {\n      \"name\": \"pf-techack_target\",\n      \"ipam\": {}\n    }\n  },\n  \"services\": {\n    \"juice-shop\": {\n      \"restart\": \"no\",\n      \"cpus\": 1,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"image\": \"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\n      \"init\": true,\n      \"mem_limit\": \"805306368\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"/nodejs/bin/node\",\n          \"-e\",\n          \"require('http').get('http://127.0.0.1:3000/',r=\\u003e{r.resume();process.exit(r.statusCode===200?0:1)}).on('error',()=\\u003eprocess.exit(1))\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 18,\n        \"start_period\": \"30s\"\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 3000,\n          \"published\": \"3000\",\n          \"protocol\": \"tcp\"\n        }\n      ]\n    },\n    \"ollama\": {\n      \"restart\": \"no\",\n      \"cpus\": 3,\n      \"command\": null,\n      \"entrypoint\": null,\n      \"environment\": {\n        \"LAB_MODEL\": \"qwen3:1.7b\",\n        \"OLLAMA_CONTEXT_LENGTH\": \"2048\",\n        \"OLLAMA_HOST\": \"0.0.0.0:11434\",\n        \"OLLAMA_KEEP_ALIVE\": \"2m\",\n        \"OLLAMA_MAX_LOADED_MODELS\": \"1\",\n        \"OLLAMA_NO_CLOUD\": \"1\",\n        \"OLLAMA_NUM_PARALLEL\": \"1\"\n      },\n      \"image\": \"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\n      \"mem_limit\": \"3221225472\",\n      \"networks\": {\n        \"model\": null\n      },\n      \"volumes\": [\n        {\n          \"type\": \"volume\",\n          \"source\": \"ollama-data\",\n          \"target\": \"/root/.ollama\",\n          \"volume\": {}\n        }\n      ],\n      \"healthcheck\": {\n        \"test\": [\n          \"CMD\",\n          \"ollama\",\n          \"list\"\n        ],\n        \"timeout\": \"5s\",\n        \"interval\": \"10s\",\n        \"retries\": 12,\n        \"start_period\": \"15s\"\n      },\n      \"ports\": [\n        {\n          \"mode\": \"ingress\",\n          \"host_ip\": \"127.0.0.1\",\n          \"target\": 11434,\n          \"published\": \"11434\",\n          \"protocol\": \"tcp\"\n        }\n      ]\n    },\n    \"tools\": {\n      \"profiles\": [\n        \"tools\"\n      ],\n      \"cap_drop\": [\n        \"ALL\"\n      ],\n      \"command\": [\n        \"python3\",\n        \"--version\"\n      ],\n      \"entrypoint\": null,\n      \"mem_limit\": \"268435456\",\n      \"networks\": {\n        \"target\": null\n      },\n      \"read_only\": true,\n      \"security_opt\": [\n        \"no-new-privileges:true\"\n      ],\n      \"tmpfs\": [\n        \"/tmp\"\n      ],\n      \"build\": {\n        \"context\": \"/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/docker/tools\",\n        \"dockerfile\": \"Dockerfile\"\n      }\n    }\n  },\n  \"volumes\": {\n    \"ollama-data\": {\n      \"name\": \"pf-techack_ollama-data\"\n    }\n  }\n}",
+      "stderr": "",
+      "seconds": 0.063
+    },
+    {
+      "url": "http://127.0.0.1:3000/",
+      "method": "GET",
+      "request": null,
+      "status": 200,
+      "seconds": 0.008,
+      "body_bytes": 9984
+    },
+    {
+      "url": "http://127.0.0.1:11434/api/version",
+      "method": "GET",
+      "request": null,
+      "status": 200,
+      "seconds": 0.001,
+      "response": {
+        "version": "0.40.16"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:11434/api/tags",
+      "method": "GET",
+      "request": null,
+      "status": 200,
+      "seconds": 0.001,
+      "response": {
+        "models": [
+          {
+            "name": "qwen3:1.7b",
+            "model": "qwen3:1.7b",
+            "modified_at": "2026-11-23T22:17:40.724737009Z",
+            "size": 1359293444,
+            "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen3",
+              "families": [
+                "qwen3"
+              ],
+              "parameter_size": "2.0B",
+              "quantization_level": "Q4_K_M",
+              "context_length": 40960,
+              "embedding_length": 2048,
+              "runner": "ggml"
+            },
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://127.0.0.1:11434/api/generate",
+      "method": "POST",
+      "request": {
+        "model": "qwen3:1.7b",
+        "prompt": "Responda em português com uma frase curta: o que é um laboratório local?",
+        "stream": false,
+        "think": false,
+        "keep_alive": 0,
+        "options": {
+          "num_ctx": 2048,
+          "num_predict": 80,
+          "temperature": 0
+        }
+      },
+      "status": 200,
+      "seconds": 6.315,
+      "response": {
+        "model": "qwen3:1.7b",
+        "created_at": "2026-11-23T22:18:01.630774921Z",
+        "response": "Um laboratório local é um espaço onde se realizam experimentos e estudos científicos, geralmente com o objetivo de investigar fenômenos naturais, desenvolver tecnologias ou testar teorias.",
+        "done": true,
+        "done_reason": "stop",
+        "context": [
+          151644,
+          872,
+          198,
+          1061,
+          618,
+          3235,
+          976,
+          2635,
+          29785,
+          36830,
+          469,
+          10608,
+          90329,
+          2847,
+          2565,
+          25,
+          297,
+          1709,
+          3958,
+          4443,
+          9327,
+          64694,
+          2205,
+          30,
+          608,
+          2152,
+          5854,
+          766,
+          151645,
+          198,
+          151644,
+          77091,
+          198,
+          151667,
+          271,
+          151668,
+          271,
+          44667,
+          9327,
+          64694,
+          2205,
+          3958,
+          4443,
+          98872,
+          49003,
+          511,
+          33760,
+          309,
+          9342,
+          436,
+          384,
+          1788,
+          45079,
+          143249,
+          16627,
+          11,
+          97892,
+          12541,
+          469,
+          297,
+          54226,
+          409,
+          4665,
+          277,
+          43485,
+          9574,
+          5676,
+          436,
+          14478,
+          2782,
+          11,
+          60244,
+          7921,
+          40834,
+          1609,
+          3473,
+          5908,
+          1273,
+          277,
+          1013,
+          67263,
+          13
+        ],
+        "total_duration": 6311596086,
+        "load_duration": 1542478334,
+        "prompt_eval_count": 37,
+        "prompt_eval_cached_count": 0,
+        "prompt_eval_duration": 638337000,
+        "eval_count": 46,
+        "eval_duration": 4126988000
+      }
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "returncode": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83\n",
+      "stderr": "",
+      "seconds": 0.021
+    },
+    {
+      "command": [
+        "docker",
+        "version"
+      ],
+      "returncode": 0,
+      "stdout": "Client:\n Version:           29.9.3\n API version:       1.56\n Go version:        go1.26.10\n Git commit:        5457199\n Built:             Tue Nov  3 21:41:57 2026\n OS/Arch:           darwin/arm64\n Context:           desktop-linux\n\nServer: Docker Desktop 4.99.0 (245822)\n Engine:\n  Version:          29.9.3\n  API version:      1.56 (minimum version 1.40)\n  Go version:       go1.26.10\n  Git commit:       70efc0e\n  Built:            Tue Nov  3 21:41:25 2026\n  OS/Arch:          linux/arm64\n  Experimental:     false\n containerd:\n  Version:          v2.4.2\n  GitCommit:        b7a25261e029d68978bbf290df0a62fc819b3c51\n runc:\n  Version:          1.5.2\n  GitCommit:        v1.5.2-0-g29dd3dc2\n docker-init:\n  Version:          0.19.0\n  GitCommit:        de40ad0\n",
+      "stderr": "",
+      "seconds": 0.026
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "version"
+      ],
+      "returncode": 0,
+      "stdout": "Docker Compose version v5.7.0\n",
+      "stderr": "",
+      "seconds": 0.043
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "ps",
+        "--format",
+        "json"
+      ],
+      "returncode": 0,
+      "stdout": "{\"Command\":\"\\\"/nodejs/bin/node /j…\\\"\",\"CreatedAt\":\"2026-11-23 19:15:24 -0300 -03\",\"Engine\":\"\",\"ExitCode\":0,\"Health\":\"healthy\",\"ID\":\"c30a5cb05659\",\"Image\":\"bkimminich/juice-shop@sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809\",\"Labels\":\"com.docker.compose.container-number=1,com.docker.compose.depends_on=,com.docker.compose.oneoff=False,com.docker.compose.service=juice-shop,org.opencontainers.image.created=”2026-11-08T19:09:22Z”,org.opencontainers.image.title=OWASP Juice Shop,org.opencontainers.image.url=https://owasp-juice.shop,org.opencontainers.image.version=20.4.0-SNAPSHOT,com.docker.compose.image=sha256:809ef984094f422d124ec473dba20af702feb47f24348ab5b5d74aae5b44ba27,com.docker.compose.project=pf-techack,desktop.docker.io/ports.scheme=v2,org.opencontainers.image.authors=Bjoern Kimminich \\u003cbjoern.kimminich@owasp.org\\u003e,org.opencontainers.image.description=Probably the most modern and sophisticated insecure web application,org.opencontainers.image.licenses=MIT,com.docker.compose.project.config_files=/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml,/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json,com.docker.compose.project.working_dir=/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack,com.docker.compose.version=5.7.0,maintainer=Bjoern Kimminich \\u003cbjoern.kimminich@owasp.org\\u003e,org.opencontainers.image.documentation=https://help.owasp-juice.shop,org.opencontainers.image.revision=266448a,org.opencontainers.image.vendor=Open Worldwide Application Security Project,com.docker.compose.config-hash=e7d381def44d25f5f12f1ee5f2bf6ba9ab459d0ad95c6208fa7edeb89b983282,desktop.docker.io/ports/3000/tcp=127.0.0.1:3000,org.opencontainers.image.source=https://github.com/juice-shop/juice-shop\",\"LocalVolumes\":\"0\",\"Mounts\":\"\",\"Name\":\"pf-techack-juice-shop-1\",\"Names\":\"pf-techack-juice-shop-1\",\"Networks\":\"pf-techack_target\",\"Ports\":\"127.0.0.1:3000-\\u003e3000/tcp\",\"Project\":\"pf-techack\",\"Publishers\":[{\"URL\":\"127.0.0.1\",\"TargetPort\":3000,\"PublishedPort\":3000,\"Protocol\":\"tcp\"}],\"RunningFor\":\"2 minutes ago\",\"Service\":\"juice-shop\",\"Size\":\"0B\",\"State\":\"running\",\"Status\":\"Up 2 minutes (healthy)\"}\n{\"Command\":\"\\\"/bin/ollama serve\\\"\",\"CreatedAt\":\"2026-11-23 19:15:24 -0300 -03\",\"Engine\":\"\",\"ExitCode\":0,\"Health\":\"healthy\",\"ID\":\"46f5511ef02c\",\"Image\":\"ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592\",\"Labels\":\"com.docker.compose.depends_on=,com.docker.compose.project.config_files=/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml,/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json,com.docker.compose.service=ollama,com.docker.compose.version=5.7.0,desktop.docker.io/ports/11434/tcp=127.0.0.1:11434,com.docker.compose.container-number=1,com.docker.compose.image=sha256:125793ec9ab40287b3bec4ba11df41d787e4d6a45c169f2198d49669a179977e,com.docker.compose.oneoff=False,com.docker.compose.project=pf-techack,com.docker.compose.project.working_dir=/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack,desktop.docker.io/ports.scheme=v2,org.opencontainers.image.version=24.04,com.docker.compose.config-hash=8dea8e4dc5937e62a3c5f9a9213bc83037371972fd71919ccb19daa26c3ea6c7\",\"LocalVolumes\":\"1\",\"Mounts\":\"pf-techack_oll…\",\"Name\":\"pf-techack-ollama-1\",\"Names\":\"pf-techack-ollama-1\",\"Networks\":\"pf-techack_model\",\"Ports\":\"127.0.0.1:11434-\\u003e11434/tcp\",\"Project\":\"pf-techack\",\"Publishers\":[{\"URL\":\"127.0.0.1\",\"TargetPort\":11434,\"PublishedPort\":11434,\"Protocol\":\"tcp\"}],\"RunningFor\":\"2 minutes ago\",\"Service\":\"ollama\",\"Size\":\"0B\",\"State\":\"running\",\"Status\":\"Up 2 minutes (healthy)\"}\n",
+      "stderr": "",
+      "seconds": 0.069
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "ps",
+        "-q",
+        "juice-shop"
+      ],
+      "returncode": 0,
+      "stdout": "c30a5cb05659ae658cf5f53550d9838ae8da5efb24d6e67268f8761890ca5e17\n",
+      "stderr": "",
+      "seconds": 0.063
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{.Name}} image={{.Image}} platform={{.Platform}} ports={{json .NetworkSettings.Ports}}",
+        "c30a5cb05659ae658cf5f53550d9838ae8da5efb24d6e67268f8761890ca5e17"
+      ],
+      "returncode": 0,
+      "stdout": "/pf-techack-juice-shop-1 image=sha256:877fc77b12d72b42e486eb09b6b1711cc56514306d92006b284e7e7cf076a809 platform=linux ports={\"3000/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"3000\"}]}\n",
+      "stderr": "",
+      "seconds": 0.019
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "ps",
+        "-q",
+        "ollama"
+      ],
+      "returncode": 0,
+      "stdout": "46f5511ef02cddd590ed4e8a982cbc566d4edc82a99c09c2c6c6197fc28ced8e\n",
+      "stderr": "",
+      "seconds": 0.061
+    },
+    {
+      "command": [
+        "docker",
+        "inspect",
+        "--format",
+        "{{.Name}} image={{.Image}} platform={{.Platform}} ports={{json .NetworkSettings.Ports}}",
+        "46f5511ef02cddd590ed4e8a982cbc566d4edc82a99c09c2c6c6197fc28ced8e"
+      ],
+      "returncode": 0,
+      "stdout": "/pf-techack-ollama-1 image=sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592 platform=linux ports={\"11434/tcp\":[{\"HostIp\":\"127.0.0.1\",\"HostPort\":\"11434\"}]}\n",
+      "stderr": "",
+      "seconds": 0.02
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "exec",
+        "-T",
+        "juice-shop",
+        "/nodejs/bin/node",
+        "-p",
+        "require('./package.json').version"
+      ],
+      "returncode": 0,
+      "stdout": "20.4.0-SNAPSHOT\n",
+      "stderr": "",
+      "seconds": 0.111
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "exec",
+        "-T",
+        "ollama",
+        "ollama",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "ollama version is 0.40.16\n",
+      "stderr": "",
+      "seconds": 0.081
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "exec",
+        "-T",
+        "ollama",
+        "ollama",
+        "list"
+      ],
+      "returncode": 0,
+      "stdout": "NAME          ID              SIZE      MODIFIED       \nqwen3:1.7b    8f68893c685c    1.4 GB    21 seconds ago    \n",
+      "stderr": "",
+      "seconds": 0.081
+    },
+    {
+      "url": "http://127.0.0.1:11434/api/tags",
+      "method": "GET",
+      "request": null,
+      "status": 200,
+      "seconds": 0.003,
+      "response": {
+        "models": [
+          {
+            "name": "qwen3:1.7b",
+            "model": "qwen3:1.7b",
+            "modified_at": "2026-11-23T22:17:40.724737009Z",
+            "size": 1359293444,
+            "digest": "8f68893c685c3ddff2aa3fffce2aa60a30bb2da65ca488b61fff134a4d1730e7",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "qwen3",
+              "families": [
+                "qwen3"
+              ],
+              "parameter_size": "2.0B",
+              "quantization_level": "Q4_K_M",
+              "context_length": 40960,
+              "embedding_length": 2048,
+              "runner": "ggml"
+            },
+            "capabilities": [
+              "completion",
+              "tools",
+              "thinking"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://127.0.0.1:11434/api/show",
+      "method": "POST",
+      "request": {
+        "model": "qwen3:1.7b"
+      },
+      "status": 200,
+      "seconds": 0.022,
+      "response": {
+        "thinking": {
+          "values": [
+            false,
+            true
+          ],
+          "default": true
+        },
+        "license": "                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n   Copyright 2024 Alibaba Cloud\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n       http://www.apache.org/licenses/LICENSE-2.0\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.",
+        "modelfile": "# Modelfile generated by \"ollama show\"\n# To build a new Modelfile based on this, replace FROM with:\n# FROM qwen3:1.7b\n\nFROM /root/.ollama/models/blobs/sha256-3d0b790534fe4b79525fc3692950408dca41171676ed7e21db57af5c65ef6ab6\nTEMPLATE \"\"\"\n{{- $lastUserIdx := -1 -}}\n{{- range $idx, $msg := .Messages -}}\n{{- if eq $msg.Role \"user\" }}{{ $lastUserIdx = $idx }}{{ end -}}\n{{- end }}\n{{- if or .System .Tools }}<|im_start|>system\n{{ if .System }}\n{{ .System }}\n{{- end }}\n{{- if .Tools }}\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{{- range .Tools }}\n{\"type\": \"function\", \"function\": {{ .Function }}}\n{{- end }}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>\n{{- end -}}\n<|im_end|>\n{{ end }}\n{{- range $i, $_ := .Messages }}\n{{- $last := eq (len (slice $.Messages $i)) 1 -}}\n{{- if eq .Role \"user\" }}<|im_start|>user\n{{ .Content }}\n{{- if and $.IsThinkSet (eq $i $lastUserIdx) }}\n   {{- if $.Think -}}\n      {{- \" \"}}/think\n   {{- else -}}\n      {{- \" \"}}/no_think\n   {{- end -}}\n{{- end }}<|im_end|>\n{{ else if eq .Role \"assistant\" }}<|im_start|>assistant\n{{ if (and $.IsThinkSet (and .Thinking (or $last (gt $i $lastUserIdx)))) -}}\n<think>{{ .Thinking }}</think>\n{{ end -}}\n{{ if .Content }}{{ .Content }}\n{{- else if .ToolCalls }}<tool_call>\n{{ range .ToolCalls }}{\"name\": \"{{ .Function.Name }}\", \"arguments\": {{ .Function.Arguments }}}\n{{ end }}</tool_call>\n{{- end }}{{ if not $last }}<|im_end|>\n{{ end }}\n{{- else if eq .Role \"tool\" }}<|im_start|>user\n<tool_response>\n{{ .Content }}\n</tool_response><|im_end|>\n{{ end }}\n{{- if and (ne .Role \"assistant\") $last }}<|im_start|>assistant\n{{ if and $.IsThinkSet (not $.Think) -}}\n<think>\n\n</think>\n\n{{ end -}}\n{{ end }}\n{{- end }}\"\"\"\nPARAMETER repeat_penalty 1\nPARAMETER stop <|im_start|>\nPARAMETER stop <|im_end|>\nPARAMETER temperature 0.6\nPARAMETER top_k 20\nPARAMETER top_p 0.95\nLICENSE \"\"\"                                 Apache License\n                           Version 2.0, January 2004\n                        http://www.apache.org/licenses/\n\n   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION\n\n   1. Definitions.\n\n      \"License\" shall mean the terms and conditions for use, reproduction,\n      and distribution as defined by Sections 1 through 9 of this document.\n\n      \"Licensor\" shall mean the copyright owner or entity authorized by\n      the copyright owner that is granting the License.\n\n      \"Legal Entity\" shall mean the union of the acting entity and all\n      other entities that control, are controlled by, or are under common\n      control with that entity. For the purposes of this definition,\n      \"control\" means (i) the power, direct or indirect, to cause the\n      direction or management of such entity, whether by contract or\n      otherwise, or (ii) ownership of fifty percent (50%) or more of the\n      outstanding shares, or (iii) beneficial ownership of such entity.\n\n      \"You\" (or \"Your\") shall mean an individual or Legal Entity\n      exercising permissions granted by this License.\n\n      \"Source\" form shall mean the preferred form for making modifications,\n      including but not limited to software source code, documentation\n      source, and configuration files.\n\n      \"Object\" form shall mean any form resulting from mechanical\n      transformation or translation of a Source form, including but\n      not limited to compiled object code, generated documentation,\n      and conversions to other media types.\n\n      \"Work\" shall mean the work of authorship, whether in Source or\n      Object form, made available under the License, as indicated by a\n      copyright notice that is included in or attached to the work\n      (an example is provided in the Appendix below).\n\n      \"Derivative Works\" shall mean any work, whether in Source or Object\n      form, that is based on (or derived from) the Work and for which the\n      editorial revisions, annotations, elaborations, or other modifications\n      represent, as a whole, an original work of authorship. For the purposes\n      of this License, Derivative Works shall not include works that remain\n      separable from, or merely link (or bind by name) to the interfaces of,\n      the Work and Derivative Works thereof.\n\n      \"Contribution\" shall mean any work of authorship, including\n      the original version of the Work and any modifications or additions\n      to that Work or Derivative Works thereof, that is intentionally\n      submitted to Licensor for inclusion in the Work by the copyright owner\n      or by an individual or Legal Entity authorized to submit on behalf of\n      the copyright owner. For the purposes of this definition, \"submitted\"\n      means any form of electronic, verbal, or written communication sent\n      to the Licensor or its representatives, including but not limited to\n      communication on electronic mailing lists, source code control systems,\n      and issue tracking systems that are managed by, or on behalf of, the\n      Licensor for the purpose of discussing and improving the Work, but\n      excluding communication that is conspicuously marked or otherwise\n      designated in writing by the copyright owner as \"Not a Contribution.\"\n\n      \"Contributor\" shall mean Licensor and any individual or Legal Entity\n      on behalf of whom a Contribution has been received by Licensor and\n      subsequently incorporated within the Work.\n\n   2. Grant of Copyright License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      copyright license to reproduce, prepare Derivative Works of,\n      publicly display, publicly perform, sublicense, and distribute the\n      Work and such Derivative Works in Source or Object form.\n\n   3. Grant of Patent License. Subject to the terms and conditions of\n      this License, each Contributor hereby grants to You a perpetual,\n      worldwide, non-exclusive, no-charge, royalty-free, irrevocable\n      (except as stated in this section) patent license to make, have made,\n      use, offer to sell, sell, import, and otherwise transfer the Work,\n      where such license applies only to those patent claims licensable\n      by such Contributor that are necessarily infringed by their\n      Contribution(s) alone or by combination of their Contribution(s)\n      with the Work to which such Contribution(s) was submitted. If You\n      institute patent litigation against any entity (including a\n      cross-claim or counterclaim in a lawsuit) alleging that the Work\n      or a Contribution incorporated within the Work constitutes direct\n      or contributory patent infringement, then any patent licenses\n      granted to You under this License for that Work shall terminate\n      as of the date such litigation is filed.\n\n   4. Redistribution. You may reproduce and distribute copies of the\n      Work or Derivative Works thereof in any medium, with or without\n      modifications, and in Source or Object form, provided that You\n      meet the following conditions:\n\n      (a) You must give any other recipients of the Work or\n          Derivative Works a copy of this License; and\n\n      (b) You must cause any modified files to carry prominent notices\n          stating that You changed the files; and\n\n      (c) You must retain, in the Source form of any Derivative Works\n          that You distribute, all copyright, patent, trademark, and\n          attribution notices from the Source form of the Work,\n          excluding those notices that do not pertain to any part of\n          the Derivative Works; and\n\n      (d) If the Work includes a \"NOTICE\" text file as part of its\n          distribution, then any Derivative Works that You distribute must\n          include a readable copy of the attribution notices contained\n          within such NOTICE file, excluding those notices that do not\n          pertain to any part of the Derivative Works, in at least one\n          of the following places: within a NOTICE text file distributed\n          as part of the Derivative Works; within the Source form or\n          documentation, if provided along with the Derivative Works; or,\n          within a display generated by the Derivative Works, if and\n          wherever such third-party notices normally appear. The contents\n          of the NOTICE file are for informational purposes only and\n          do not modify the License. You may add Your own attribution\n          notices within Derivative Works that You distribute, alongside\n          or as an addendum to the NOTICE text from the Work, provided\n          that such additional attribution notices cannot be construed\n          as modifying the License.\n\n      You may add Your own copyright statement to Your modifications and\n      may provide additional or different license terms and conditions\n      for use, reproduction, or distribution of Your modifications, or\n      for any such Derivative Works as a whole, provided Your use,\n      reproduction, and distribution of the Work otherwise complies with\n      the conditions stated in this License.\n\n   5. Submission of Contributions. Unless You explicitly state otherwise,\n      any Contribution intentionally submitted for inclusion in the Work\n      by You to the Licensor shall be under the terms and conditions of\n      this License, without any additional terms or conditions.\n      Notwithstanding the above, nothing herein shall supersede or modify\n      the terms of any separate license agreement you may have executed\n      with Licensor regarding such Contributions.\n\n   6. Trademarks. This License does not grant permission to use the trade\n      names, trademarks, service marks, or product names of the Licensor,\n      except as required for reasonable and customary use in describing the\n      origin of the Work and reproducing the content of the NOTICE file.\n\n   7. Disclaimer of Warranty. Unless required by applicable law or\n      agreed to in writing, Licensor provides the Work (and each\n      Contributor provides its Contributions) on an \"AS IS\" BASIS,\n      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or\n      implied, including, without limitation, any warranties or conditions\n      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A\n      PARTICULAR PURPOSE. You are solely responsible for determining the\n      appropriateness of using or redistributing the Work and assume any\n      risks associated with Your exercise of permissions under this License.\n\n   8. Limitation of Liability. In no event and under no legal theory,\n      whether in tort (including negligence), contract, or otherwise,\n      unless required by applicable law (such as deliberate and grossly\n      negligent acts) or agreed to in writing, shall any Contributor be\n      liable to You for damages, including any direct, indirect, special,\n      incidental, or consequential damages of any character arising as a\n      result of this License or out of the use or inability to use the\n      Work (including but not limited to damages for loss of goodwill,\n      work stoppage, computer failure or malfunction, or any and all\n      other commercial damages or losses), even if such Contributor\n      has been advised of the possibility of such damages.\n\n   9. Accepting Warranty or Additional Liability. While redistributing\n      the Work or Derivative Works thereof, You may choose to offer,\n      and charge a fee for, acceptance of support, warranty, indemnity,\n      or other liability obligations and/or rights consistent with this\n      License. However, in accepting such obligations, You may act only\n      on Your own behalf and on Your sole responsibility, not on behalf\n      of any other Contributor, and only if You agree to indemnify,\n      defend, and hold each Contributor harmless for any liability\n      incurred by, or claims asserted against, such Contributor by reason\n      of your accepting any such warranty or additional liability.\n\n   END OF TERMS AND CONDITIONS\n\n   APPENDIX: How to apply the Apache License to your work.\n\n      To apply the Apache License to your work, attach the following\n      boilerplate notice, with the fields enclosed by brackets \"[]\"\n      replaced with your own identifying information. (Don't include\n      the brackets!)  The text should be enclosed in the appropriate\n      comment syntax for the file format. We also recommend that a\n      file or class name and description of purpose be included on the\n      same \"printed page\" as the copyright notice for easier\n      identification within third-party archives.\n   Copyright 2024 Alibaba Cloud\n   Licensed under the Apache License, Version 2.0 (the \"License\");\n   you may not use this file except in compliance with the License.\n   You may obtain a copy of the License at\n       http://www.apache.org/licenses/LICENSE-2.0\n   Unless required by applicable law or agreed to in writing, software\n   distributed under the License is distributed on an \"AS IS\" BASIS,\n   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n   See the License for the specific language governing permissions and\n   limitations under the License.\"\"\"\n",
+        "parameters": "repeat_penalty                 1\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"\ntemperature                    0.6\ntop_k                          20\ntop_p                          0.95",
+        "template": "\n{{- $lastUserIdx := -1 -}}\n{{- range $idx, $msg := .Messages -}}\n{{- if eq $msg.Role \"user\" }}{{ $lastUserIdx = $idx }}{{ end -}}\n{{- end }}\n{{- if or .System .Tools }}<|im_start|>system\n{{ if .System }}\n{{ .System }}\n{{- end }}\n{{- if .Tools }}\n\n# Tools\n\nYou may call one or more functions to assist with the user query.\n\nYou are provided with function signatures within <tools></tools> XML tags:\n<tools>\n{{- range .Tools }}\n{\"type\": \"function\", \"function\": {{ .Function }}}\n{{- end }}\n</tools>\n\nFor each function call, return a json object with function name and arguments within <tool_call></tool_call> XML tags:\n<tool_call>\n{\"name\": <function-name>, \"arguments\": <args-json-object>}\n</tool_call>\n{{- end -}}\n<|im_end|>\n{{ end }}\n{{- range $i, $_ := .Messages }}\n{{- $last := eq (len (slice $.Messages $i)) 1 -}}\n{{- if eq .Role \"user\" }}<|im_start|>user\n{{ .Content }}\n{{- if and $.IsThinkSet (eq $i $lastUserIdx) }}\n   {{- if $.Think -}}\n      {{- \" \"}}/think\n   {{- else -}}\n      {{- \" \"}}/no_think\n   {{- end -}}\n{{- end }}<|im_end|>\n{{ else if eq .Role \"assistant\" }}<|im_start|>assistant\n{{ if (and $.IsThinkSet (and .Thinking (or $last (gt $i $lastUserIdx)))) -}}\n<think>{{ .Thinking }}</think>\n{{ end -}}\n{{ if .Content }}{{ .Content }}\n{{- else if .ToolCalls }}<tool_call>\n{{ range .ToolCalls }}{\"name\": \"{{ .Function.Name }}\", \"arguments\": {{ .Function.Arguments }}}\n{{ end }}</tool_call>\n{{- end }}{{ if not $last }}<|im_end|>\n{{ end }}\n{{- else if eq .Role \"tool\" }}<|im_start|>user\n<tool_response>\n{{ .Content }}\n</tool_response><|im_end|>\n{{ end }}\n{{- if and (ne .Role \"assistant\") $last }}<|im_start|>assistant\n{{ if and $.IsThinkSet (not $.Think) -}}\n<think>\n\n</think>\n\n{{ end -}}\n{{ end }}\n{{- end }}",
+        "template_source": "go_template",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3",
+          "families": [
+            "qwen3"
+          ],
+          "parameter_size": "2.0B",
+          "quantization_level": "Q4_K_M"
+        },
+        "model_info": {
+          "general.architecture": "qwen3",
+          "general.basename": "Qwen3",
+          "general.file_type": 15,
+          "general.parameter_count": 2031739904,
+          "general.quantization_version": 2,
+          "general.size_label": "1.7B",
+          "general.type": "model",
+          "qwen3.attention.head_count": 16,
+          "qwen3.attention.head_count_kv": 8,
+          "qwen3.attention.key_length": 128,
+          "qwen3.attention.layer_norm_rms_epsilon": 1e-06,
+          "qwen3.attention.value_length": 128,
+          "qwen3.block_count": 28,
+          "qwen3.context_length": 40960,
+          "qwen3.embedding_length": 2048,
+          "qwen3.feed_forward_length": 6144,
+          "qwen3.rope.freq_base": 1000000,
+          "tokenizer.ggml.add_bos_token": false,
+          "tokenizer.ggml.bos_token_id": 151643,
+          "tokenizer.ggml.eos_token_id": 151645,
+          "tokenizer.ggml.merges": [],
+          "tokenizer.ggml.model": "gpt2",
+          "tokenizer.ggml.padding_token_id": 151643,
+          "tokenizer.ggml.pre": "qwen2",
+          "tokenizer.ggml.token_type": [],
+          "tokenizer.ggml.tokens": []
+        },
+        "capabilities": [
+          "completion",
+          "tools",
+          "thinking"
+        ],
+        "modified_at": "2026-11-23T22:17:40.724737009Z"
+      }
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "run",
+        "--rm",
+        "--no-deps",
+        "tools",
+        "curl",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "curl 7.88.1 (aarch64-unknown-linux-gnu) libcurl/7.88.1 OpenSSL/3.0.22 zlib/1.2.13 brotli/1.0.9 zstd/1.5.4 libidn2/2.3.3 libpsl/0.21.2 (+libidn2/2.3.3) libssh2/1.10.0 nghttp2/1.52.0 librtmp/2.3 OpenLDAP/2.5.13\nRelease-Date: 2023-02-20, security patched: 7.88.1-10+deb12u15\nProtocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps mqtt pop3 pop3s rtmp rtsp scp sftp smb smbs smtp smtps telnet tftp\nFeatures: alt-svc AsynchDNS brotli GSS-API HSTS HTTP2 HTTPS-proxy IDN IPv6 Kerberos Largefile libz NTLM NTLM_WB PSL SPNEGO SSL threadsafe TLS-SRP UnixSockets zstd\n",
+      "stderr": " Container pf-techack-tools-run-2ac42b66e3bf Creating \n Container pf-techack-tools-run-2ac42b66e3bf Created \n",
+      "seconds": 0.224
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "run",
+        "--rm",
+        "--no-deps",
+        "tools",
+        "nmap",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "Nmap version 7.93 ( https://nmap.org )\nPlatform: aarch64-unknown-linux-gnu\nCompiled with: liblua-5.3.6 openssl-3.0.22 libssh2-1.10.0 libz-1.2.13 libpcre-8.39 libpcap-1.10.3 nmap-libdnet-1.12 ipv6\nCompiled without:\nAvailable nsock engines: epoll poll select\n",
+      "stderr": " Container pf-techack-tools-run-c38f0e54d77a Creating \n Container pf-techack-tools-run-c38f0e54d77a Created \n",
+      "seconds": 0.247
+    },
+    {
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.yaml",
+        "-f",
+        "/Users/guedes/Documents/Insper/Aulas26.2/TecHacker/pf-techack/compose.lock.json",
+        "run",
+        "--rm",
+        "--no-deps",
+        "tools",
+        "python3",
+        "--version"
+      ],
+      "returncode": 0,
+      "stdout": "Python 3.11.2\n",
+      "stderr": " Container pf-techack-tools-run-5c3a40214ea2 Creating \n Container pf-techack-tools-run-5c3a40214ea2 Created \n",
+      "seconds": 0.227
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "pf-techack-tools",
+        "--format",
+        "{{.Id}}"
+      ],
+      "returncode": 0,
+      "stdout": "sha256:17b2774b1c5deaee240eadb18c630f7a36c52fcffe35b7ac343114aa2bea0dfe\n",
+      "stderr": "",
+      "seconds": 0.03
+    }
+  ],
+  "action": "up",
+  "host": {
+    "system": "Darwin",
+    "release": "25.6.0",
+    "machine": "arm64",
+    "python": "3.9.6"
+  },
+  "success": true,
+  "finished_at": "2026-11-23T22:18:02.982207+00:00"
+}

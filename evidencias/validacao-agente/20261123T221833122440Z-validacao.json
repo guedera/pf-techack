@@ -1,0 +1,69 @@
+{
+  "started_at": "2026-11-23T22:18:03.078398+00:00",
+  "target": "http://127.0.0.1:3000",
+  "model": "qwen3:1.7b",
+  "checks": [
+    {
+      "name": "http_request alcança o Juice Shop",
+      "result": {
+        "status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "bytes": 26963,
+        "redirect": null
+      },
+      "ok": true
+    },
+    {
+      "name": "tcp_scan no host autorizado",
+      "result": {
+        "host": "127.0.0.1",
+        "scanned": 1,
+        "seconds": 0.0,
+        "open": [
+          3000
+        ],
+        "results": [
+          {
+            "port": 3000,
+            "state": "open"
+          }
+        ]
+      },
+      "ok": true
+    },
+    {
+      "name": "escopo bloqueia destino externo",
+      "result": "destinos externos bloqueados antes de qualquer requisição",
+      "ok": true
+    },
+    {
+      "name": "modelo propõe ação em JSON",
+      "result": {
+        "seconds": 12.1,
+        "parsed": true,
+        "tool": "http_request",
+        "valid_tool": true,
+        "params": {
+          "method": "GET",
+          "path": "/rest/...",
+          "headers": {
+            "Authorization": "Bearer <token>"
+          },
+          "body": {},
+          "content_type": "application/json"
+        }
+      },
+      "ok": true
+    },
+    {
+      "name": "modelo interpreta resultado",
+      "result": {
+        "hypothesis": "suporta",
+        "interpretation": "o resultado mostra que a API está acessível e retorna dados em formato JSON, indicando que há uma resposta positiva para a requisição GET /rest/products/search."
+      },
+      "ok": true
+    }
+  ],
+  "finished_at": "2026-11-23T22:18:33.122044+00:00",
+  "success": true
+}

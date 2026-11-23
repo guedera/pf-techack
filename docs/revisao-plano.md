@@ -115,31 +115,42 @@ controlado.
 
 ## Decisões da dupla
 
+**Atualização em 23/11/2026:** as sugestões técnicas foram incorporadas à proposta
+`plano-revisado.md`, produzida com apoio de IA. A tabela abaixo permanece destinada
+às decisões efetivas da dupla: incorporar uma sugestão à proposta não equivale a
+registrar que os integrantes a aceitaram ou que já a executaram. Preencher antes
+das novas sessões e registrar a data real da decisão, sem retroagir ao plano original.
+
 Preencher para cada sugestão: **aceita**, **modificada** ou **rejeitada**, com justificativa
 técnica. O plano que guiará os testes deve ser registrado em seguida, sem apagar o original.
 
+**Decisão registrada em 23/11/2026 por Guilherme Guedes:** aceita as três revisões de
+investigação e o `plano-revisado.md` na íntegra. Portanto, as sugestões abaixo ficam
+aceitas conforme as justificativas técnicas já descritas em cada item; sua eficácia será
+avaliada nas novas sessões, sem alterar o planejamento humano original.
+
 | ID | Decisão | Justificativa técnica |
 | --- | --- | --- |
-| G1 | | |
-| G2 | | |
-| G3 | | |
-| G4 | | |
-| G5 | | |
-| G6 | | |
-| G7 | | |
-| I1.1 | | |
-| I1.2 | | |
-| I1.3 | | |
-| I1.4 | | |
-| I2.1 | | |
-| I2.2 | | |
-| I2.3 | | |
-| I2.4 | | |
-| I2.5 | | |
-| I3.1 | | |
-| I3.2 | | |
-| I3.3 | | |
-| I3.4 | | |
+| G1 | Aceita | Delimitar hipóteses torna a evidência verificável. |
+| G2 | Aceita | Controles permitem distinguir falha de teste de resultado válido. |
+| G3 | Aceita | Critérios prévios evitam conclusões além das evidências. |
+| G4 | Aceita | Ações dinâmicas permanecem sob autorização humana. |
+| G5 | Aceita | Evidência bruta e avaliação humana permitem auditoria. |
+| G6 | Aceita | Estado inicial conhecido melhora a comparação entre sessões. |
+| G7 | Aceita | Falhas e incertezas devem resultar em conclusão inconclusiva. |
+| I1.1 | Aceita | A hipótese passa a comparar respostas observáveis do login. |
+| I1.2 | Aceita | O endpoint real será confirmado antes da conclusão. |
+| I1.3 | Aceita | Conta conhecida, inexistente e login válido funcionam como controles. |
+| I1.4 | Aceita | Status e corpo sustentam a comparação de respostas. |
+| I2.1 | Aceita | Leitura cruzada é uma hipótese de autorização objetiva. |
+| I2.2 | Aceita | Tokens e IDs reais evitam parâmetros fictícios. |
+| I2.3 | Aceita | Itens diferentes comprovam a propriedade de cada carrinho. |
+| I2.4 | Aceita | Acesso próprio e sem sessão são controles necessários. |
+| I2.5 | Aceita | O teste fica limitado à leitura, sem misturar alteração. |
+| I3.1 | Aceita | O recorte limita a hipótese a recursos sem autenticação. |
+| I3.2 | Aceita | A definição prévia evita classificar conteúdo público como sensível. |
+| I3.3 | Aceita | `robots.txt` será tratado como pista, não como vulnerabilidade. |
+| I3.4 | Aceita | A lista curta mantém o reconhecimento controlado e reproduzível. |
 
 ## Nota sobre o revisor
 

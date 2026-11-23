@@ -23,15 +23,17 @@ import argparse
 import datetime as dt
 import ipaddress
 import json
+import math
 import re
 import socket
 import subprocess
 import sys
 import time
+import uuid
 import urllib.error
 import urllib.request
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, urlencode
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_BYTES = 200_000       # teto do que a ferramenta lê/guarda
@@ -114,10 +116,49 @@ def _clean_headers(raw):
         if not isinstance(k, str) or not isinstance(v, (str, int, float)):
             raise ValueError("nome e valor de cabeçalho devem ser texto.")
         v = str(v)
+        if k.lower() in ("host", "content-length", "transfer-encoding", "connection", "proxy-authorization"):
+            raise ValueError("Cabeçalho controlado pelo transporte: " + k)
+        if "<token>" in v.lower():
+            raise ValueError("Substitua <token> pelo token real da conta de teste.")
         if len(k) > 128 or len(v) > 8192 or re.search(r"[\r\n]", k + v):
             raise ValueError("cabeçalho inválido (tamanho ou quebra de linha).")
         clean[k] = v
     return clean
+
+
+def validate_tool_params(tool, params):
+    """Valida uma proposta sem executar rede ou abrir sockets."""
+    if tool not in TOOLS:
+        raise ValueError("Ferramenta desconhecida: " + str(tool))
+    if not isinstance(params, dict):
+        raise ValueError("params deve ser um objeto JSON.")
+    if tool == "http_request":
+        method = str(params.get("method", "GET")).upper()
+        if method not in ALLOWED_METHODS:
+            raise ValueError("method deve ser um de: " + ", ".join(ALLOWED_METHODS) + ".")
+        _build_http_url(params.get("path", "/"))
+        timeout = float(params.get("timeout", 15))
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout deve ser positivo e finito.")
+        headers = _clean_headers(params.get("headers"))
+        if params.get("body") is not None and method != "GET":
+            body = params["body"]
+            content_type = params.get("content_type", "application/json")
+            if not isinstance(content_type, str) or not content_type.strip():
+                raise ValueError("content_type deve ser texto não vazio.")
+            if isinstance(body, dict) and content_type == "application/x-www-form-urlencoded":
+                urlencode(body).encode()
+            elif not isinstance(body, str):
+                json.dumps(body).encode()
+            headers.setdefault("Content-Type", content_type)
+            _clean_headers(headers)
+        return
+    ports = _parse_ports(params.get("ports", str(TARGET_PORT)))
+    if ports != [TARGET_PORT]:
+        raise ValueError("Fora do escopo: somente a porta {} do Juice Shop é autorizada.".format(TARGET_PORT))
+    timeout = float(params.get("timeout", 1.0))
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError("timeout deve ser positivo e finito.")
 
 
 def tool_http_request(params):
@@ -126,12 +167,19 @@ def tool_http_request(params):
         raise ValueError("method deve ser um de: " + ", ".join(ALLOWED_METHODS) + ".")
     url = _build_http_url(params.get("path", "/"))
     timeout = min(float(params.get("timeout", 15)), 30)
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError("timeout deve ser positivo e finito.")
     headers = _clean_headers(params.get("headers"))
     data = None
     if params.get("body") is not None and method != "GET":
         body = params["body"]
-        data = body.encode() if isinstance(body, str) else json.dumps(body).encode()
-        headers.setdefault("Content-Type", params.get("content_type", "application/json"))
+        content_type = params.get("content_type", "application/json")
+        if isinstance(body, dict) and content_type == "application/x-www-form-urlencoded":
+            data = urlencode(body).encode()
+        else:
+            data = body.encode() if isinstance(body, str) else json.dumps(body).encode()
+        headers.setdefault("Content-Type", content_type)
+        headers = _clean_headers(headers)
     req = urllib.request.Request(url, data=data, method=method, headers=headers)
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), NoRedirect())
     start = time.monotonic()
@@ -161,8 +209,12 @@ def _parse_ports(spec):
     for part in spec.split(","):
         if "-" in part:
             a, b = part.split("-", 1)
+            if not 1 <= int(a) <= int(b) <= 65535 or int(b) - int(a) >= 100:
+                raise ValueError("Intervalo de portas inválido ou excessivo.")
             ports.extend(range(int(a), int(b) + 1))
         elif part:
+            if not 1 <= int(part) <= 65535:
+                raise ValueError("Porta fora do intervalo válido.")
             ports.append(int(part))
     ports = sorted({p for p in ports if 1 <= p <= 65535})
     if not ports:
@@ -175,10 +227,15 @@ def _parse_ports(spec):
 def tool_tcp_scan(params):
     """Reconhecimento: TCP connect só no HOST autorizado (nunca em outro IP)."""
     ports = _parse_ports(params.get("ports", str(TARGET_PORT)))
+    if ports != [TARGET_PORT]:
+        raise ValueError("Fora do escopo: somente a porta {} do Juice Shop é autorizada.".format(TARGET_PORT))
     timeout = min(float(params.get("timeout", 1.0)), 3.0)
+    if not math.isfinite(timeout) or timeout <= 0:
+        raise ValueError("timeout deve ser positivo e finito.")
     results, start = [], time.monotonic()
     for port in ports:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        family = socket.AF_INET6 if ":" in TARGET_HOST else socket.AF_INET
+        s = socket.socket(family, socket.SOCK_STREAM)
         s.settimeout(timeout)
         try:
             s.connect((TARGET_HOST, port))
@@ -201,14 +258,14 @@ TOOLS = {
         "run": tool_http_request,
         "help": ('UMA requisição HTTP ao Juice Shop (interage direto com o alvo). '
                  'Métodos: GET, POST, PUT, DELETE, PATCH. '
-                 'params: {"method":"GET","path":"/rest/...","headers":{"Authorization":"Bearer <token>"},'
-                 '"body":<opcional>,"content_type":<opcional>}. Use headers para autenticar '
-                 '(o Juice Shop usa token Bearer) e testar autorização.'),
+                 'params: {"method":"GET","path":"/rest/...","headers":{},'
+                 '"body":<opcional>,"content_type":<opcional>}. Só inclua Authorization quando '
+                 'o humano fornecer um token real; nunca use valores placeholder.'),
     },
     "tcp_scan": {
         "run": tool_tcp_scan,
         "help": ('Varredura TCP connect de portas NO host do alvo (reconhecimento). '
-                 'params: {"ports":"3000"}  — também "1-1024" ou "80,443"; máx 100 portas.'),
+                 'params: {"ports":"' + str(TARGET_PORT) + '"}; somente a porta do Juice Shop é autorizada.'),
     },
 }
 
@@ -236,20 +293,13 @@ def model_generate(system, prompt, num_predict=320, timeout=300):
 def extract_json(text):
     """Extrai o primeiro objeto JSON balanceado da resposta do modelo."""
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.S)
-    start = text.find("{")
-    while start != -1:
-        depth = 0
-        for i in range(start, len(text)):
-            if text[i] == "{":
-                depth += 1
-            elif text[i] == "}":
-                depth -= 1
-                if depth == 0:
-                    try:
-                        return json.loads(text[start:i + 1])
-                    except json.JSONDecodeError:
-                        break
-        start = text.find("{", start + 1)
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"\{", text):
+        try:
+            value, _ = decoder.raw_decode(text[match.start():])
+            return value
+        except json.JSONDecodeError:
+            continue
     return None
 
 
@@ -266,6 +316,8 @@ def compact_history(history):
         lines.append("[{}] {} {} | decisão={} | {}".format(
             h["step"], h["tool"], json.dumps(h["params"], ensure_ascii=False),
             h["decision"], obs))
+        lines.append("Evidência: " + h.get("evidence", "não executada"))
+        lines.append("Avaliação humana: " + h.get("human_evaluation", ""))
     return "\n".join(lines)
 
 
@@ -284,7 +336,10 @@ INTERPRET_SYSTEM = (
     "Você interpreta o resultado de uma ferramenta de teste de segurança sobre o alvo "
     "autorizado. Responda SOMENTE com JSON:\n"
     '{"interpretation":"o que o resultado mostra, com cautela","hypothesis":"suporta|refuta|inconclusivo","done":false}\n'
-    "Uma sugestão não é prova: só afirme o que a evidência sustenta."
+    "Uma sugestão não é prova: só afirme o que a evidência sustenta. "
+    "Timeout ou erro de ferramenta implica resultado inconclusivo. HTML de uma SPA "
+    "com status 200 não demonstra autenticação nem acesso ao carrinho. Não copie o "
+    "texto do exemplo. Ausência de evidência não prova segurança."
 )
 
 
@@ -293,14 +348,18 @@ INTERPRET_SYSTEM = (
 # --------------------------------------------------------------------------- #
 class Log:
     def __init__(self, investigation):
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", investigation):
+            raise ValueError("Identificador inválido.")
         self.investigation = investigation
+        self.session_id = uuid.uuid4().hex
         self.dir = ROOT / "evidencias" / ("investigacao-" + investigation)
         self.dir.mkdir(parents=True, exist_ok=True)
-        self.path = self.dir / "registro.jsonl"
+        self.path = self.dir / ("registro-" + self.session_id + ".jsonl")
 
     def event(self, step, phase, **data):
         rec = {"ts": dt.datetime.now(dt.timezone.utc).isoformat(),
-               "investigation": self.investigation, "step": step, "phase": phase}
+               "investigation": self.investigation, "session_id": self.session_id,
+               "step": step, "phase": phase}
         rec.update(data)
         with self.path.open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -316,6 +375,14 @@ def ask(prompt):
     return input(prompt).strip()
 
 
+def ask_required(prompt):
+    while True:
+        value = ask(prompt)
+        if value:
+            return value
+        print("Preencha este campo para manter a investigação verificável.")
+
+
 def supervise(proposal):
     """Devolve (decision, final_params, justification). Uma ação modificada é reaprovada."""
     params = proposal.get("params", {})
@@ -325,17 +392,20 @@ def supervise(proposal):
         print("  Justificativa do modelo: {}".format(proposal.get("rationale", "")))
         choice = ask("  [a]utorizar  [m]odificar  [r]ejeitar  [e]ncerrar > ").lower()
         if choice in ("a", "autorizar"):
-            return "autorizado", params, ask("  Justificativa (opcional): ")
+            return "autorizado", params, ask_required("  Justificativa técnica: ")
         if choice in ("r", "rejeitar"):
-            return "rejeitado", params, ask("  Motivo da rejeição: ")
+            return "rejeitado", params, ask_required("  Motivo da rejeição: ")
         if choice in ("e", "encerrar"):
             return "encerrar", params, ""
         if choice in ("m", "modificar"):
             raw = ask("  Novos params em JSON: ")
             try:
-                params = json.loads(raw)
+                updated = json.loads(raw)
+                if not isinstance(updated, dict):
+                    raise ValueError("params precisa ser um objeto JSON")
+                params = updated
                 proposal = dict(proposal, params=params)  # reaprovação na volta do laço
-            except json.JSONDecodeError as exc:
+            except ValueError as exc:
                 print("  JSON inválido ({}); parâmetros mantidos.".format(exc))
 
 
@@ -343,6 +413,10 @@ def supervise(proposal):
 # Laço principal de uma investigação
 # --------------------------------------------------------------------------- #
 def run(objective, investigation, max_steps):
+    if not objective or re.search(r"<objetivo|\[preencher\]", objective, re.I):
+        raise ValueError("Informe um objetivo concreto, sem placeholders.")
+    if max_steps < 1:
+        raise ValueError("max_steps deve ser positivo.")
     log = Log(investigation)
     log.event(0, "objetivo", objective=objective, target=TARGET, model=MODEL)
     print("Alvo autorizado: {}\nModelo: {}\nRegistro: {}\n".format(TARGET, MODEL, log.path))
@@ -426,7 +500,9 @@ def run(objective, investigation, max_steps):
                     objective, proposal["tool"], json.dumps(final_params, ensure_ascii=False),
                     preview),
                 num_predict=260)
-            parsed = extract_json(raw_i) or {}
+            parsed = extract_json(raw_i)
+            if not isinstance(parsed, dict) or not isinstance(parsed.get("interpretation"), str) or not parsed["interpretation"].strip() or parsed.get("hypothesis") not in ("suporta", "refuta", "inconclusivo"):
+                raise RuntimeError("Interpretação inválida: " + raw_i[:300])
             interpretation = parsed.get("interpretation", raw_i[:300])
             log.event(step, "interpretacao", interpretation=interpretation,
                       hypothesis=parsed.get("hypothesis"), model_done=parsed.get("done"))
@@ -438,20 +514,23 @@ def run(objective, investigation, max_steps):
             print("  Modelo não interpretou o resultado: {}".format(exc))
 
         # 5) Avaliação da dupla e decisão de continuar ------------------------
-        evaluation = ask("\n  Sua avaliação deste resultado: ")
+        if status == "erro":
+            print("  Atenção: falha da ferramenta não confirma nem refuta a hipótese.")
+        evaluation = ask_required("\n  Sua avaliação deste resultado: ")
         cont = ask("  Continuar a investigação? [s/n] > ").lower()
         log.event(step, "decisao", human_evaluation=evaluation,
                   continue_investigation=cont.startswith("s"))
         history.append({"step": step, "tool": proposal["tool"], "params": final_params,
                         "decision": decision, "status": status,
-                        "interpretation": interpretation})
+                        "interpretation": interpretation, "evidence": preview,
+                        "human_evaluation": evaluation})
         if not cont.startswith("s"):
             print("Investigação encerrada pela dupla.")
             break
     else:
         print("Limite de {} passos atingido.".format(max_steps))
 
-    conclusion = ask("\nConclusão da investigação (hipótese sustentada/rejeitada/inconclusiva e limites): ")
+    conclusion = ask_required("\nConclusão da investigação (hipótese sustentada/rejeitada/inconclusiva e limites): ")
     log.event(step, "conclusao", conclusion=conclusion)
     print("\nRegistro completo em: {}".format(log.path))
 

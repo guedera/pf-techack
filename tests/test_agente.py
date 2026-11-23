@@ -71,7 +71,7 @@ class SuperviseTests(unittest.TestCase):
     def test_modify_requires_reapproval_and_keeps_final_params(self):
         # modifica uma vez, depois autoriza
         with patch.object(agente, "ask",
-                          side_effect=["m", '{"method":"GET","path":"/rest/user/whoami"}', "a", ""]):
+                          side_effect=["m", '{"method":"GET","path":"/rest/user/whoami"}', "a", "Verificar identidade"]):
             decision, params, _ = agente.supervise(
                 {"tool": "http_request", "params": {"path": "/"}, "rationale": "x"})
         self.assertEqual(decision, "autorizado")
@@ -95,6 +95,56 @@ class RedirectTests(unittest.TestCase):
         # redirect_request devolve None => urllib não segue o 3xx
         self.assertIsNone(
             agente.NoRedirect().redirect_request(None, None, 302, "Found", {}, "http://example.org"))
+
+
+class RegressionTests(unittest.TestCase):
+    def test_scan_blocks_other_ports_before_socket(self):
+        with patch.object(agente.socket, "socket") as sock:
+            with self.assertRaises(ValueError):
+                agente.tool_tcp_scan({"ports": "80,443"})
+            sock.assert_not_called()
+
+    def test_headers_block_placeholder_and_host(self):
+        for headers in ({"Host": "other"}, {"Authorization": "Bearer <token>"}):
+            with self.assertRaises(ValueError):
+                agente._clean_headers(headers)
+
+    def test_proposal_validation_is_side_effect_free(self):
+        with patch.object(agente.urllib.request, "build_opener") as opener:
+            agente.validate_tool_params("http_request", {"method": "GET", "path": "/"})
+            opener.assert_not_called()
+        with self.assertRaises(ValueError):
+            agente.validate_tool_params("http_request", {
+                "method": "GET", "path": "/rest/user/whoami",
+                "headers": {"Authorization": "Bearer <token>"}})
+
+    def test_json_with_braces_inside_string(self):
+        self.assertEqual(agente.extract_json('{"interpretation":"literal } na resposta"}')['interpretation'], "literal } na resposta")
+
+    def test_history_includes_response_and_human_correction(self):
+        result = agente.compact_history([dict(step=1, tool="http_request", params={},
+            decision="autorizado", evidence='{"status":200,"body":"HTML"}',
+            human_evaluation="HTML não demonstra acesso a dados")])
+        self.assertIn('"body":"HTML"', result)
+        self.assertIn("HTML não demonstra acesso", result)
+
+    def test_sessions_are_separate(self):
+        with tempfile.TemporaryDirectory() as tmp, patch.object(agente, "ROOT", Path(tmp)):
+            a, b = agente.Log("01"), agente.Log("01")
+            self.assertNotEqual(a.path, b.path)
+            a.event(0, "objetivo")
+            self.assertEqual(json.loads(a.path.read_text())["session_id"], a.session_id)
+
+    def test_placeholder_never_calls_model(self):
+        with patch.object(agente, "model_generate") as model:
+            with self.assertRaises(ValueError):
+                agente.run("<objetivo da investigação 1>", "01", 3)
+            model.assert_not_called()
+
+    def test_empty_supervision_reason_reprompts(self):
+        with patch.object(agente, "ask", side_effect=["a", "", "Verificar endpoint"]):
+            decision, _, reason = agente.supervise({"tool":"http_request","params":{}})
+            self.assertEqual((decision, reason), ("autorizado", "Verificar endpoint"))
 
 
 if __name__ == "__main__":
