@@ -98,6 +98,24 @@ class RedirectTests(unittest.TestCase):
 
 
 class RegressionTests(unittest.TestCase):
+    def test_session_references_resolve_only_from_captured_values(self):
+        source = {"method": "GET", "path": "/rest/basket/$last_basket_id",
+                  "headers": {"Authorization": "Bearer $last_token"}}
+        resolved, refs = agente.resolve_session_references(
+            source, {"token": "token-real", "basket_id": "42"})
+        self.assertEqual(resolved["path"], "/rest/basket/42")
+        self.assertEqual(resolved["headers"]["Authorization"], "Bearer token-real")
+        self.assertEqual(refs, ["$last_token", "$last_basket_id"])
+        self.assertEqual(source["path"], "/rest/basket/$last_basket_id")
+        with self.assertRaises(ValueError):
+            agente.resolve_session_references(source, {})
+
+    def test_login_session_metadata_is_extracted_without_other_fields(self):
+        result = {"status": 200, "body": json.dumps({"authentication": {
+            "token": "token-real", "bid": 42, "umail": "test@lab.local"}})}
+        self.assertEqual(agente.capture_session_values(result),
+                         {"token": "token-real", "basket_id": "42"})
+
     def test_scan_blocks_other_ports_before_socket(self):
         with patch.object(agente.socket, "socket") as sock:
             with self.assertRaises(ValueError):

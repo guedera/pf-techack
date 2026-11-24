@@ -1,0 +1,34 @@
+{
+  "started_at": "2026-11-24T02:57:39.723370+00:00",
+  "target": "http://127.0.0.1:3000",
+  "model": "qwen3:1.7b",
+  "checks": [
+    {
+      "name": "http_request alcança o Juice Shop",
+      "ok": false,
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "tcp_scan no host autorizado",
+      "ok": false,
+      "error": "porta do alvo não aberta"
+    },
+    {
+      "name": "escopo bloqueia destino externo",
+      "result": "destinos externos bloqueados antes de qualquer requisição",
+      "ok": true
+    },
+    {
+      "name": "modelo propõe ação em JSON",
+      "ok": false,
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "name": "modelo interpreta resultado",
+      "ok": false,
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    }
+  ],
+  "finished_at": "2026-11-24T02:57:39.725730+00:00",
+  "success": false
+}

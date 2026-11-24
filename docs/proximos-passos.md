@@ -1,45 +1,27 @@
-# Retomada e fechamento da entrega
+# Fechamento da entrega
 
-## Estado em 23/11/2026
+## Concluído em 24/11/2026
 
-Laboratório e agente possuem implementação e registros históricos. O agente foi corrigido após revisão das evidências. As três investigações históricas são inconclusivas pelos motivos descritos em `analise-critica.md`; os registros foram preservados. O plano revisado é uma proposta com apoio de IA, a ser avaliada pela dupla.
+- Laboratório e agente supervisionado implementados.
+- Testes unitários do agente executados com sucesso após os ajustes de sessão.
+- Plano revisado e decisões humanas registrados.
+- Investigação 1 concluída: hipótese rejeitada no endpoint de login testado.
+- Investigação 2 concluída: leitura cruzada do carrinho de B pela sessão de A comprovada.
+- Investigação 3 concluída: arquivo interno entregue sem autenticação comprovado.
+- Resumos das três investigações e relatório técnico atualizados com os registros finais.
 
-Em 23/11/2026, Guilherme iniciou o laboratório e guardou o registro `evidencias/sprint-1/20261123T221802982327Z-up.json`. O Juice Shop e o Ollama ficaram saudáveis. Após corrigir a checagem de parâmetros, a validação confirmou HTTP, TCP, bloqueio de destino externo, geração em JSON e interpretação local. O registro válido mais recente é `evidencias/validacao-agente/20261123T222212507024Z-validacao.json`; a execução anterior foi preservada porque documenta o falso positivo com `<token>`.
+## Arquivos centrais de evidência
 
-## 1. Serviços e validação concluídos
+- `evidencias/investigacao-01/registro-80a1c220c6994810aa1779250e3222c7.jsonl`
+- `evidencias/investigacao-01/registro-119f0bf0a571414ba9a905360feb7df3.jsonl`
+- `evidencias/investigacao-02/registro-a97c20578c8f4c4f97d08219e20d932f.jsonl`
+- `evidencias/investigacao-02/registro-7f02c9b0faf14e5995efe78d1317fa8c.jsonl`
+- `evidencias/investigacao-03/registro-ab6d025aa74943e3b13197bcdd6a5b0a.jsonl`
 
-Os comandos executados foram:
+## Falta apenas preparar a submissão
 
-```bash
-python3 scripts/lab.py up
-python3 scripts/valida_agente.py
-```
-
-Sem `.env`, os padrões são loopback, portas 3000/11434 e Qwen3 1.7B. Se já houver `.env`, conferir os valores antes; não sobrescrevê-lo. A primeira inicialização neste Mac baixa imagens/modelo e constrói ferramentas. O lock fixa as imagens. O `up` executa pull do modelo, cujo digest deve ser comparado com os registros históricos. Registrar eventual mudança de modelo/host, sem tratar a reprodução como a sessão anterior.
-
-Após uma correção adicional para rejeitar também parâmetros inválidos antes da execução, rodar novamente apenas `python3 scripts/valida_agente.py`. Validar também o acesso a partir do Kali usando o endereço privado efetivamente configurado; loopback do Mac não é acessível como localhost dentro da VM.
-
-## 2. Revisar o plano
-
-Ler `plano-revisado.md` e preencher as decisões reais em `revisao-plano.md`. O assistente propôs os ajustes técnicos; as justificativas da dupla não foram inventadas. Preservar o planejamento original.
-
-## 3. Executar as sessões supervisionadas
-
-Guardar dados úteis antes de cada reset, pois ele descarta o estado do Juice Shop. Abrir uma sessão privada nova no navegador. Repetir para IDs 01, 02 e 03:
-
-```bash
-python3 scripts/lab.py reset --confirm
-python3 scripts/agente.py --id 01 --plano docs/plano-revisado.md
-```
-
-O agente lê o objetivo do plano, mas a dupla informa descobertas, tokens e IDs reais ao modificar parâmetros e avaliar resultados. Não autorizar placeholders ou conclusões baseadas apenas em HTTP 200. A próxima proposta recebe a prévia do resultado e a avaliação humana. Os novos arquivos `registro-<sessao>.jsonl` não sobrescrevem os antigos.
-
-Ao terminar, atualizar o resumo de cada investigação com o estado inicial, a sessão nova, intervenções e conclusão. Citar o nome do arquivo e a etapa para não confundir sessões.
-
-## 4. Preparar a entrega
-
-- Completar inventário atual do host e Kali; trazer JSON original/captura do Kali, se disponíveis. Não reconstruir registros como se fossem originais.
-- Incorporar resultados novos na análise crítica e no relatório técnico. Renderizar e conferir 4–6 páginas; Markdown não garante paginação.
-- Gravar vídeo de até 10 minutos com `roteiro-video.md`.
-- Reproduzir o laboratório pelas instruções, guardar validação real e conferir cinco entregáveis: laboratório, código, registros, relatório e vídeo.
-- Conferir prazo, formato e canal de submissão na disciplina.
+1. Conferir o relatório em `docs/relatorio-tecnico.md` e exportá-lo para PDF, garantindo o limite de 4–6 páginas exigido.
+2. Gravar o vídeo de até 10 minutos com base em `docs/roteiro-video.md`, mostrando uma investigação completa, uma intervenção humana e a localização do JSONL correspondente.
+3. Registrar ou anexar a evidência disponível da Kali, caso a disciplina exija essa demonstração separadamente.
+4. Revisar `git status`, adicionar apenas os arquivos da entrega e fazer commit/push.
+5. Conferir prazo, formato e canal de envio da disciplina.

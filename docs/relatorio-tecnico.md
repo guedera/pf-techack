@@ -1,69 +1,82 @@
 # Testes de segurança com agente de IA supervisionado
 
 **Luiz Miguel e Guilherme Guedes — Tecnologias Hackers**
-
-**Versão de trabalho, 23/11/2026.** Este texto descreve as evidências existentes. A conclusão das novas sessões, a revisão da dupla e a conferência de 4–6 páginas no documento renderizado são necessárias antes da entrega.
+**Versão consolidada: 24/11/2026**
 
 ## 1. Objetivo e escopo
 
-O projeto investiga a contribuição de um modelo de linguagem local para testes de segurança no OWASP Juice Shop. O agente seleciona ferramentas e propõe ações; os integrantes avaliam cada proposta e permanecem responsáveis por sua execução e pela interpretação técnica dos resultados. O objetivo é avaliar a qualidade do processo investigativo, incluindo erros, limitações e intervenções humanas.
+O trabalho avalia o uso de um modelo de linguagem local como apoio a testes de segurança supervisionados. O alvo é exclusivamente uma instância local e isolada do OWASP Juice Shop. O agente não possui terminal livre, não aceita outro destino e somente dispõe de requisições HTTP ao alvo e de diagnóstico TCP da porta autorizada. Cada ação proposta exige uma decisão explícita da dupla: autorizar, modificar, rejeitar ou encerrar.
 
-O ambiente documentado inicialmente utiliza máquinas pessoais, conforme alternativa informada pelo grupo. Essa adaptação substitui o kit mencionado no enunciado. O único alvo de testes é a instância local do Juice Shop; o serviço de inferência e os demais serviços do host não fazem parte do escopo ofensivo.
+O objetivo não foi provar autonomia do modelo. O experimento avalia se suas propostas ajudam a investigar hipóteses verificáveis e como a supervisão humana corrige erros de rota, parâmetros, interpretação e conclusão. Todas as contas, produtos e dados usados nas investigações foram fictícios e criados no laboratório.
 
-## 2. Arquitetura e reprodução
+## 2. Ambiente e agente
 
-Na preparação registrada em 17/11, o MacBook Air M1 com 8 GB de Luiz hospedou Juice Shop e Ollama em Docker. A VM Kali da dupla acessou a aplicação na LAN do laboratório, pelo endereço `172.16.50.247:3000`. A API do Ollama ficou publicada apenas em loopback, na porta 11434. O endereço é uma referência histórica e precisa ser atualizado ao reproduzir o ambiente em outra rede.
+O laboratório utiliza Docker para executar Juice Shop e Ollama. A aplicação foi acessada localmente em `http://127.0.0.1:3000`; o modelo usado foi `qwen3:1.7b`. As imagens são fixadas em `compose.lock.json`, e `scripts/lab.py` registra inicialização, verificação e restauração em JSON. Os registros de Sprint 1 documentam a disponibilidade do Juice Shop, do modelo e do ambiente.
 
-O modelo inicial foi Qwen3 1.7B, quantizado em Q4_K_M, executado localmente. As imagens dos serviços foram fixadas por digest em `compose.lock.json`. O script `scripts/lab.py` inicializa os serviços, verifica HTTP e inferência, coleta inventário e registra resultados em JSON. O Juice Shop não usa volume persistente: sua recriação permite restaurar o estado, enquanto os pesos do modelo permanecem em volume separado.
+O agente, implementado em `scripts/agente.py` apenas com biblioteca padrão do Python, registra cada objetivo, proposta, decisão humana, execução, interpretação e conclusão em JSONL. A ferramenta HTTP valida host, porta, método e cabeçalhos antes do contato com o alvo. Ela não segue redirecionamentos e limita o tamanho da resposta. A ferramenta TCP só permite a porta configurada do Juice Shop.
 
-Os registros de 17/11 comprovam inicialização e restauração bem-sucedidas. A restauração verificou alteração do ID do contêiner, manutenção da imagem, remoção de um marcador e zero desafios resolvidos na API. O registro `20261117T141308210590Z-reset.json` sustenta essa conclusão. Os dados do navegador exigem tratamento separado, como uso de uma nova sessão privada.
+Durante o experimento, o agente foi ajustado em resposta a limitações observadas do modelo: propostas JSON truncadas, placeholders de token, repetição de respostas inválidas e tentativa de copiar tokens no prompt. A versão final usa referências internas aprováveis (`$last_token` e `$last_basket_id`) que só são resolvidas no instante da execução e não precisam aparecer no histórico do modelo. Os testes unitários locais do agente passaram após essas alterações.
 
-O agente foi desenvolvido em Python com biblioteca padrão e integra duas ferramentas: requisição HTTP ao alvo e conexão TCP. As ações exigem autorização humana; a dupla pode modificar parâmetros, rejeitar ou encerrar. Os resultados são enviados ao modelo para interpretação e orientação da proposta seguinte. O programa registra propostas, parâmetros, decisões, execuções, interpretações e conclusões em JSONL.
+## 3. Método
 
-## 3. Planejamento
+O plano revisado definiu, antes da execução, critérios de sustentação, rejeição e inconclusão. Cada investigação combinou controles e uma conclusão limitada ao endpoint e estado realmente avaliados.
 
-O planejamento humano original foi preservado no commit `5191db0` e abordou login, controle de acesso a carrinhos e exposição de informações. A revisão externa registrada em `docs/revisao-plano.md` foi feita por Claude, distinguindo-se do modelo local usado pelo agente. Sua tabela de decisões humanas ainda precisa ser concluída pela dupla.
+1. **Login:** comparar falha de senha de uma conta fictícia existente com falha para endereço inexistente, depois de confirmar o login válido.
+2. **Carrinhos:** comprovar propriedade de dois carrinhos de contas fictícias A e B, inserir um produto conhecido em B e tentar a leitura de B usando a sessão de A.
+3. **Arquivos internos:** usar `robots.txt` somente como pista, consultar uma lista curta de caminhos justificados e verificar se algum recurso interno é entregue sem autenticação.
 
-A análise posterior identificou necessidade de delimitar melhor as hipóteses. Credenciais presentes no corpo enviado ao login não demonstram, isoladamente, vazamento. Alterar o ID no navegador só constitui evidência de falha de autorização se o servidor devolver dados de outra conta. A presença de caminhos em `robots.txt` é uma pista, mas sua publicidade não demonstra exposição indevida.
+As sessões históricas permanecem preservadas em `registro.jsonl`. Elas serviram para evidenciar limitações iniciais, mas as conclusões abaixo foram produzidas somente a partir dos novos registros citados em cada resumo.
 
-O plano revisado propõe controles e critérios explícitos: comparar respostas de autenticação para contas existentes e inexistentes; verificar leitura cruzada entre dois carrinhos de propriedade conhecida; e examinar conteúdo de recursos descobertos sem autenticação. A autoria assistida dessa revisão está declarada, mantendo intacta a estratégia original.
+## 4. Resultados
 
-## 4. Resultados das sessões históricas
-
-| Investigação | Evidência obtida | Conclusão da reavaliação |
+| Investigação | Evidência principal | Resultado |
 | --- | --- | --- |
-| Login | Scan de 80/443; GET/POST em `/login` com HTML de 9.984 bytes | Inconclusiva: não foi demonstrado teste válido da autenticação |
-| Carrinho | GET em `/cart` e `/user`, incluindo token placeholder; retorno HTML | Inconclusiva: não houve comprovação de acesso a carrinho alheio |
-| Dados sensíveis | Raiz rejeitada; `/users` com timeout | Inconclusiva: nenhuma resposta permite avaliar o conteúdo |
+| 1 — Login | Dois logins inválidos retornaram a mesma assinatura: HTTP 401, 26 bytes e mesmo ETag | Hipótese rejeitada no recorte |
+| 2 — Carrinhos | Sessão de A leu o carrinho 7 de B, contendo item conhecido, com HTTP 200 e 747 bytes | Hipótese sustentada no recorte |
+| 3 — Arquivos | Sem autenticação, `/ftp/incident-support.kdbx` retornou HTTP 200, `application/octet-stream` e 3.246 bytes | Hipótese sustentada no recorte |
 
-Na investigação 1, o arquivo contém duas sessões. A primeira começou com objetivo placeholder; a segunda terminou com conclusão humana de hipótese refutada. Essa conclusão excede as evidências, pois o HTML recebido não demonstra operação do login nem comparação adequada de respostas. A análise posterior preserva o registro e explicita a divergência.
+### 4.1 Tratamento do login
 
-Na investigação 2, o modelo sugeriu credencial literal `<token>` e não estabeleceu identidades ou carrinhos de referência. A dupla reconheceu no passo 3 que o resultado era insuficiente para provar ausência de falha. Essa intervenção é relevante porque contrasta com a classificação de segurança apresentada pelo modelo. A conclusão final da sessão ficou vazia.
+O agente inicialmente propôs rota, campos e token fictícios incorretos. A dupla modificou as ações para criar uma conta fictícia, confirmar o cadastro com HTTP 201 e validar `POST /rest/user/login` por meio de um controle positivo com HTTP 200. Só então foram executados os dois controles negativos.
 
-Na investigação 3, a ferramenta falhou por timeout, mas o modelo marcou a hipótese como refutada. Não houve resposta da aplicação nem avaliação humana final preenchida. A classificação posterior é inconclusiva. Os detalhes, datas e referências às etapas estão nos `resumo.md` das respectivas pastas de evidências.
+Para a conta existente com senha errada e para o endereço inexistente com a mesma senha errada, a aplicação retornou HTTP 401, corpo de 26 bytes e o mesmo ETag. Não foi observada diferença que revelasse a existência da conta. Portanto, a hipótese de enumeração de usuários foi rejeitada para esse endpoint, parâmetros e versão do laboratório. O resultado não permite generalizar para outros fluxos de autenticação.
 
-## 5. Análise crítica e correções
+Os registros principais são `evidencias/investigacao-01/registro-80a1c220c6994810aa1779250e3222c7.jsonl` e `evidencias/investigacao-01/registro-119f0bf0a571414ba9a905360feb7df3.jsonl`.
 
-Os registros demonstram propostas repetitivas, uso de parâmetros fictícios e generalizações sem evidência. O caso mais direto é a interpretação do timeout como refutação: o erro foi identificado ao comparar a interpretação com o evento de falha da ferramenta. Ausência de resposta não permite distinguir um recurso protegido de um recurso vulnerável.
+### 4.2 Autorização de leitura de carrinhos
 
-A qualidade da integração também influenciou o desempenho. O código anterior enviava à próxima etapa apenas um resumo da interpretação, omitindo respostas das ferramentas e avaliações humanas. Assim, não é possível atribuir os problemas exclusivamente ao tamanho do modelo. A correção implementada inclui evidência e avaliação humana no histórico, além de reforçar a cautela sobre HTML genérico e falhas de transporte no prompt.
+Foram criadas duas contas fictícias. Os controles próprios associaram o carrinho 6 à conta A e o carrinho 7 à conta B. A conta B inseriu o produto público de ID 1 em seu carrinho; a leitura autenticada de B retornou uma resposta JSON de 747 bytes.
 
-Outras correções bloqueiam tokens placeholder e cabeçalhos de transporte indevidos, restringem o TCP à porta do Juice Shop, corrigem formulários URL-encoded, exigem justificativas e separam arquivos por sessão. A validação foi ajustada para reprovar propostas, parâmetros ou interpretações inválidos. Vinte e nove testes offline passaram; eles comprovam comportamentos locais e regressões específicas, não a qualidade do novo comportamento do modelo em uma investigação real.
+Depois, uma nova sessão autenticada de A requisitou `GET /rest/basket/7`. A resposta retornou HTTP 200, 747 bytes e o mesmo ETag visto na consulta do próprio carrinho de B. Como a propriedade dos carrinhos e o item preparado haviam sido comprovados antes, a resposta demonstra leitura cruzada causada pela alteração do identificador.
 
-Em 23/11, Guilherme reproduziu o laboratório no Mac. O registro de inicialização confirma Docker 29.9.3, imagens fixadas, Juice Shop 20.4.0-SNAPSHOT em ARM64 e Qwen3 1.7B Q4_K_M. O registro de validação confirmou acesso HTTP ao alvo, porta 3000 aberta, bloqueio de destinos externos e comunicação com o modelo. A primeira execução também revelou que a checagem aceitava os parâmetros apenas estruturalmente: o modelo repetiu `Bearer <token>`. O executor bloquearia esse valor, mas o validador registrou sucesso. A validação foi então endurecida para verificar os parâmetros sem executar rede, mostrando novamente como uma saída formalmente válida pode continuar tecnicamente inadequada.
+A hipótese de leitura indevida foi sustentada para `GET /rest/basket/:id`. Não foram testadas alterações no carrinho de outra conta, outros métodos ou outros recursos. Os registros principais são `evidencias/investigacao-02/registro-a97c20578c8f4c4f97d08219e20d932f.jsonl` e `evidencias/investigacao-02/registro-7f02c9b0faf14e5995efe78d1317fa8c.jsonl`.
 
-As limitações remanescentes incluem contexto finito, envio de prévias em vez de todo o resultado e conjunto restrito de ferramentas. O corpo HTTP é limitado a 200 KB e sinaliza truncamento. A supervisão deve conferir os registros e delimitar as conclusões ao que foi efetivamente testado. A análise detalhada encontra-se em `docs/analise-critica.md`.
+### 4.3 Exposição de arquivos internos
 
-## 6. Conclusão provisória
+O primeiro scan TCP confirmou a disponibilidade da porta, mas não contribuía para a hipótese. A dupla registrou essa limitação e prosseguiu com `GET /robots.txt`. O arquivo apontou para `/ftp`; a consulta desse diretório retornou uma listagem HTML real, contendo nomes internos como `incident-support.kdbx`, `package.json.bak` e `suspicious_errors.yml`.
 
-O projeto dispõe de laboratório reproduzível, agente supervisionado e registros que permitem identificar erros concretos da IA e insuficiências na condução dos testes. As sessões históricas não permitem confirmar ou refutar adequadamente as três hipóteses. Seu valor principal é evidenciar por que a supervisão técnica e a validação dos parâmetros são necessárias.
+Foi feita uma única verificação adicional, sem autenticação, de `GET /ftp/incident-support.kdbx`. A aplicação retornou HTTP 200, tipo `application/octet-stream` e 3.246 bytes. Isso comprova que um arquivo interno identificado na listagem é entregue publicamente. O conteúdo binário não foi processado e não houve tentativa de extrair senhas ou credenciais.
 
-Para consolidar os resultados experimentais, as novas sessões devem aplicar os controles definidos no plano revisado e documentar as intervenções reais da dupla. A infraestrutura corrigida foi exercitada com o modelo local, mas sua eficácia investigativa depende dessas três sessões. Não foi demonstrada superioridade da IA sobre a estratégia humana.
+Assim, a hipótese foi sustentada quanto à exposição de arquivo interno. A conclusão não afirma conhecimento do conteúdo lógico do arquivo KDBX. O registro é `evidencias/investigacao-03/registro-ab6d025aa74943e3b13197bcdd6a5b0a.jsonl`.
 
-## Fontes do projeto
+## 5. Análise crítica do agente
+
+O modelo local contribuiu com propostas iniciais e recebeu os resultados anteriores, mas apresentou limitações relevantes. Ele sugeriu endpoints inexistentes, campos trocados, tokens placeholder, objetos JSON fora do esquema e interpretações que confundiam preparação com evidência. Em mais de uma ocasião, classificou incorretamente a hipótese como sustentada ou refutada antes de haver comparação suficiente.
+
+A supervisão foi essencial. Na investigação 1, ela exigiu controle positivo e impediu que a consulta de perguntas de segurança fosse tratada como autenticação. Na investigação 2, ela estabeleceu a propriedade dos carrinhos antes da leitura cruzada, corrigiu a confusão entre A e B e impediu a exposição de token ao modelo. Na investigação 3, ela distinguiu `robots.txt` como pista de uma listagem de diretório e limitou a verificação do arquivo KDBX a metadados observáveis.
+
+As correções no agente melhoraram a segurança e a auditabilidade da execução, mas não eliminam a necessidade de análise humana. Em particular, modificar os parâmetros de uma proposta não troca a ferramenta selecionada pelo modelo; isso ficou explícito na primeira etapa da investigação 3. Esse comportamento foi documentado, e a consulta HTTP foi proposta e aprovada separadamente.
+
+## 6. Conclusão
+
+O laboratório forneceu evidências reproduzíveis e delimitadas para as três hipóteses. Não houve indício observável de enumeração de contas no login testado. Em contraste, a leitura autenticada de um carrinho de B pela sessão de A demonstrou falha de autorização no endpoint de carrinho, e a entrega pública do arquivo `incident-support.kdbx` demonstrou exposição de recurso interno sem autenticação.
+
+O resultado principal sobre IA é que o modelo local não substituiu a investigação técnica. Seus erros de formato, parâmetros e interpretação foram parte importante do experimento e ficaram registrados. A dupla, ao definir controles, autorizar cada ação e limitar as conclusões, tornou os resultados verificáveis e evitou que respostas plausíveis, porém incorretas, virassem evidência.
+
+## Referências internas
 
 - Enunciado: `AF - Tecnologias Hackers 26-2.pdf`.
-- Laboratório e restauração: `docs/laboratorio.md` e `evidencias/sprint-1/`.
-- Estratégia original e revisão: `docs/plano-humano.md`, `docs/revisao-plano.md` e `docs/plano-revisado.md`.
-- Registros brutos: `evidencias/investigacao-01/registro.jsonl`, `evidencias/investigacao-02/registro.jsonl` e `evidencias/investigacao-03/registro.jsonl`.
-- Implementação: `scripts/agente.py`, `scripts/lab.py` e `scripts/valida_agente.py`.
+- Planejamento original e revisão: `docs/plano-humano.md`, `docs/revisao-plano.md` e `docs/plano-revisado.md`.
+- Ambiente e restauração: `docs/laboratorio.md` e `evidencias/sprint-1/`.
+- Resumos e registros brutos: `evidencias/investigacao-01/`, `evidencias/investigacao-02/` e `evidencias/investigacao-03/`.
+- Implementação e validações: `scripts/agente.py`, `scripts/lab.py`, `scripts/valida_agente.py` e `tests/test_agente.py`.

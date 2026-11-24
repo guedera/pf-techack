@@ -1,27 +1,23 @@
-# Investigação 3 — exposição de dados sensíveis
+# Investigação 3 — exposição de arquivos internos
 
-Reavaliação documental em 23/11/2026; fonte: `registro.jsonl`, iniciado em 21/11 às 20:17 UTC e encerrado em 22/11 às 19:02 UTC. Não houve nova execução.
+## 1. Hipótese
 
-## 1. Hipótese inicial
+Caminhos descobertos durante o reconhecimento poderiam entregar arquivos internos ou dados sensíveis sem autenticação.
 
-A aplicação poderia expor informações importantes e credenciais por acesso indevido.
+## 2. Sessão e encadeamento das evidências
 
-## 2. Estratégia proposta pelo grupo
+Os registros históricos em `registro.jsonl` permanecem como referência das limitações anteriores. A investigação válida está em `registro-ab6d025aa74943e3b13197bcdd6a5b0a.jsonl`.
 
-Examinar `robots.txt` e seguir caminhos relevantes. O arquivo público seria uma pista de reconhecimento, não prova de vazamento por si só.
+O primeiro passo proposto foi um TCP scan. A modificação de parâmetros não troca a ferramenta, portanto apenas confirmou que a porta 3000 estava aberta; a dupla registrou que isso não examinava `robots.txt`. Na etapa seguinte, `GET /robots.txt` sem autenticação retornou HTTP 200 e indicou `/ftp` como pista. Em seguida, `GET /ftp/` retornou uma listagem HTML real de 11.265 bytes, incluindo `incident-support.kdbx`, `package.json.bak` e `suspicious_errors.yml`.
 
-## 3. Contribuição do agente
+## 3. Verificação do recurso sensível
 
-Propôs GET na raiz e depois `/users`, sem explorar a pista registrada no plano humano.
+A dupla selecionou somente `GET /ftp/incident-support.kdbx`, por ser um arquivo interno identificado na listagem. Sem autenticação, a resposta foi HTTP 200, `application/octet-stream` e 3.246 bytes. O conteúdo binário não foi processado e não houve tentativa de extrair credenciais.
 
-## 4. Execução
+## 4. Intervenções e limitações do agente
 
-A consulta à raiz foi rejeitada. A única ação autorizada, GET `/users`, terminou com `urlopen error timed out`. Não houve resposta HTTP utilizável, e o estado inicial não foi documentado por referência a reset.
+O modelo adicionou indevidamente uma referência de token a uma consulta que deveria ser anônima e interpretou a resposta como inconclusiva. A dupla removeu o cabeçalho, delimitou a análise a status, tipo e tamanho e corrigiu a conclusão com base na resposta preservada.
 
-## 5. Intervenção humana
+## 5. Conclusão
 
-A dupla rejeitou a raiz por considerar que não contribuiria para a hipótese. A consulta seguinte foi autorizada sem justificativa preenchida. A avaliação humana e a conclusão finais ficaram vazias.
-
-## 6. Conclusão
-
-**Inconclusiva.** O modelo marcou a hipótese como refutada após timeout; isso não é sustentado pela evidência. A falha de transporte não permite avaliar exposição de conteúdo. Esta correção é posterior à execução e deve ser identificada como tal. A ocorrência serve como exemplo concreto de limitação da IA, mas não substitui uma investigação tecnicamente adequada do recurso.
+**Hipótese sustentada no recorte testado.** O diretório público e o recurso `incident-support.kdbx` foram entregues sem autenticação, o que comprova exposição de arquivo interno potencialmente sensível. A conclusão não afirma acesso ao conteúdo lógico do banco KDBX nem extração de credenciais; limita-se à exposição pública observada no estado atual do laboratório.

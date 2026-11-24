@@ -1,27 +1,23 @@
-# Investigação 2 — autorização de carrinhos
+# Investigação 2 — autorização de leitura de carrinhos
 
-Reavaliação documental em 23/11/2026; fonte: `registro.jsonl`, sessão iniciada em 19/11 às 13:12 UTC. Não houve nova execução.
+## 1. Hipótese
 
-## 1. Hipótese inicial
+Uma conta autenticada conseguiria ler o carrinho de outra ao alterar o identificador do recurso.
 
-Um usuário poderia acessar o carrinho de outro alterando seu identificador.
+## 2. Sessões e preparação controlada
 
-## 2. Estratégia proposta pelo grupo
+Os registros históricos em `registro.jsonl` são preservados, mas não demonstravam identidade, propriedade ou resposta útil da API. A evidência válida está nas sessões `registro-720fcb4ce8e9496f82d185a191a8d1ce.jsonl`, `registro-a97c20578c8f4c4f97d08219e20d932f.jsonl` e `registro-7f02c9b0faf14e5995efe78d1317fa8c.jsonl`.
 
-Alterar o ID armazenado no cliente e observar os itens. Para concluir sobre autorização, é necessário comprovar a identidade da sessão, a propriedade dos carrinhos e a resposta do servidor.
+A dupla criou duas contas fictícias, A e B, e autenticou ambas pelo endpoint validado `POST /rest/user/login`. Os logins capturaram internamente token e ID de carrinho, sem registrar o token no resumo. Os controles próprios confirmaram o carrinho 6 para A e o carrinho 7 para B. O produto público de ID 1 foi inserido, sob a sessão de B, no carrinho 7; uma consulta posterior de B retornou 747 bytes, confirmando o item preparado.
 
-## 3. Contribuição do agente
+## 3. Teste cruzado
 
-Propôs consultas a `/cart` e `/user`, incluindo literalmente `Authorization: Bearer <token>` e repetindo ações semelhantes.
+Com uma sessão nova de A, a dupla requisitou `GET /rest/basket/7` usando somente a referência interna ao token de A. A resposta foi HTTP 200, JSON de 747 bytes e ETag `W/"2eb-auV7F46/alYsyWxF5c5nzCb+XX0"`, idênticos aos observados quando B leu o próprio carrinho 7 com o produto conhecido.
 
-## 4. Execução
+## 4. Intervenções e limitações do agente
 
-Os passos 1, 3 e 4 produziram HTML de 9.984 bytes, com status 200. Não há comparação de duas contas/carrinhos nem token válido demonstrado. Não há estado inicial ou reset específico citado na sessão.
+O modelo propôs endpoints, cabeçalhos e formatos incorretos, além de confundir A e B nas interpretações. A dupla modificou os parâmetros antes das execuções, rejeitou repetição inútil e registrou o motivo. Para evitar cópia ou exposição de JWT no prompt, o agente passou a resolver internamente as referências aprovadas `$last_token` e `$last_basket_id` somente no instante da execução.
 
-## 5. Intervenção humana
+## 5. Conclusão
 
-O passo 2 foi rejeitado com justificativa sem conteúdo técnico. No passo 3, a dupla registrou que o resultado era insuficiente para provar ausência da falha, contrapondo-se à interpretação do modelo de que o site seria seguro. A sessão foi encerrada no passo 5.
-
-## 6. Conclusão
-
-**Inconclusiva.** A conclusão histórica está vazia; esta é uma análise posterior, não uma decisão registrada durante a execução. O HTML retornado não prova acesso ao conteúdo de carrinhos. Repetir com contas, tokens, IDs e controles reais do laboratório.
+**Hipótese sustentada no recorte testado.** A sessão de A recebeu o conteúdo do carrinho 7, comprovadamente pertencente a B, após a alteração do identificador no caminho. A conclusão cobre apenas leitura no endpoint `GET /rest/basket/:id`, com as contas e dados fictícios do laboratório; nenhuma alteração de carrinho alheio foi investigada.

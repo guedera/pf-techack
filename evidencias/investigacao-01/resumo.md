@@ -1,27 +1,28 @@
 # Investigação 1 — tratamento do login
 
-Reavaliação documental em 23/11/2026; fonte histórica: `registro.jsonl`. Não houve nova execução.
+## 1. Hipótese
 
-## 1. Hipótese inicial
+As respostas de autenticação poderiam distinguir uma conta existente de uma inexistente quando ambas recebessem senha inválida.
 
-O tratamento do login poderia expor informações do usuário, conforme o plano humano original.
+## 2. Sessões e controles
 
-## 2. Estratégia proposta pelo grupo
+As sessões históricas em `registro.jsonl` são preservadas como evidência das limitações iniciais: consultaram a SPA em `/login` e não validaram a API de autenticação. A investigação válida foi composta pelas sessões `registro-80a1c220c6994810aa1779250e3222c7.jsonl` e `registro-119f0bf0a571414ba9a905360feb7df3.jsonl`.
 
-Inspecionar credenciais no payload/cabeçalhos com DevTools, Burp ou Wireshark. Esse critério precisa de refinamento: o envio de senha no corpo de uma requisição de login não prova exposição indevida.
+Na primeira, a dupla corrigiu propostas incorretas do modelo, obteve uma pergunta de segurança, criou uma conta fictícia e confirmou o controle positivo: `POST /api/Users` retornou HTTP 201 e o login válido em `POST /rest/user/login` retornou HTTP 200. Assim, endpoint, método e formato do corpo ficaram comprovados antes dos testes negativos.
 
-## 3. Contribuição do agente
+## 3. Execução
 
-Na sessão das 12:23 UTC de 19/11, o objetivo era um placeholder e a IA sugeriu scan das portas 80 e 443. Na segunda sessão do arquivo, sugeriu GET/POST em `/login`, com repetição da consulta.
+Na sessão final, foram comparados dois `POST /rest/user/login` com a mesma senha inválida:
 
-## 4. Execução
+| Caso | Status | Corpo | ETag |
+| --- | ---: | ---: | --- |
+| Conta fictícia existente | 401 | 26 bytes | `W/"1a-ARJvVK+smzAF3QQve2mDSG+3Eus"` |
+| Endereço fictício inexistente | 401 | 26 bytes | `W/"1a-ARJvVK+smzAF3QQve2mDSG+3Eus"` |
 
-O scan retornou portas fechadas. A segunda sessão registrou três respostas HTTP 200 com HTML de 9.984 bytes, sem demonstrar chamada válida à API de autenticação. Não há referência a um reset específico dessas sessões; não inferir estado inicial a partir de um reset antigo.
+## 4. Intervenções e limitações do agente
 
-## 5. Intervenção humana
+O Qwen3 1.7B inicialmente propôs rotas, campos e tokens fictícios. A dupla rejeitou ou modificou essas ações, exigiu o controle positivo e corrigiu interpretações que tratavam preparação como evidência de autenticação. Houve também propostas JSON incompletas; elas foram registradas e não executadas.
 
-As ações foram autorizadas sem justificativa preenchida. No passo 1 da segunda sessão, a avaliação humana reconheceu insuficiência; no passo 2 e na conclusão passou a afirmar ausência de vazamento, sem evidência adicional adequada.
+## 5. Conclusão
 
-## 6. Conclusão
-
-O log original registra hipótese refutada, mas esta reavaliação a classifica como **inconclusiva**: os testes não demonstram ter exercitado o login real nem comparado controles. Preservar a conclusão original como dado histórico e explicar a correção no relatório. Novas sessões devem seguir o recorte verificável do plano revisado, com arquivo próprio.
+**Hipótese rejeitada no recorte testado.** As duas falhas de login tiveram a mesma assinatura observável, sem diferença que permitisse enumerar a existência da conta. A conclusão limita-se ao endpoint `POST /rest/user/login`, aos parâmetros usados e ao estado atual do laboratório.

@@ -161,6 +161,51 @@ def validate_tool_params(tool, params):
         raise ValueError("timeout deve ser positivo e finito.")
 
 
+def capture_session_values(result):
+    """Extrai referências efêmeras de uma resposta de login sem expor o token ao modelo."""
+    if not isinstance(result, dict) or result.get("status") != 200:
+        return {}
+    try:
+        authentication = json.loads(result.get("body", "")).get("authentication", {})
+    except (TypeError, ValueError):
+        return {}
+    token, basket_id = authentication.get("token"), authentication.get("bid")
+    captured = {}
+    if isinstance(token, str) and token.strip():
+        captured["token"] = token
+    if isinstance(basket_id, int) or (isinstance(basket_id, str) and basket_id.isdigit()):
+        captured["basket_id"] = str(basket_id)
+    return captured
+
+
+def resolve_session_references(params, session):
+    """Resolve referências aprovadas pela dupla só no instante da execução.
+
+    O modelo vê apenas ``$last_token`` e ``$last_basket_id``. A referência só vale
+    nesta sessão, exige valor capturado em resposta anterior e não é escrita no log.
+    """
+    resolved = json.loads(json.dumps(params))
+    refs = []
+    headers = resolved.get("headers")
+    if isinstance(headers, dict) and headers.get("Authorization") == "Bearer $last_token":
+        token = session.get("token")
+        if not token:
+            raise ValueError("Nenhum token real foi capturado nesta sessão.")
+        headers["Authorization"] = "Bearer " + token
+        refs.append("$last_token")
+    path = resolved.get("path")
+    if isinstance(path, str) and "$last_basket_id" in path:
+        basket_id = session.get("basket_id")
+        if not basket_id:
+            raise ValueError("Nenhum ID de carrinho foi capturado nesta sessão.")
+        resolved["path"] = path.replace("$last_basket_id", basket_id)
+        refs.append("$last_basket_id")
+    raw = json.dumps(resolved)
+    if "$last_token" in raw or "$last_basket_id" in raw:
+        raise ValueError("Referência de sessão inválida ou não suportada.")
+    return resolved, refs
+
+
 def tool_http_request(params):
     method = str(params.get("method", "GET")).upper()
     if method not in ALLOWED_METHODS:
@@ -273,7 +318,7 @@ TOOLS = {
 # --------------------------------------------------------------------------- #
 # Modelo local (Ollama)
 # --------------------------------------------------------------------------- #
-def model_generate(system, prompt, num_predict=320, timeout=300):
+def model_generate(system, prompt, num_predict=520, timeout=300):
     payload = {
         "model": MODEL, "system": system, "prompt": prompt, "stream": False,
         "think": False, "keep_alive": "5m",
@@ -318,6 +363,11 @@ def compact_history(history):
             h["decision"], obs))
         lines.append("Evidência: " + h.get("evidence", "não executada"))
         lines.append("Avaliação humana: " + h.get("human_evaluation", ""))
+        session = h.get("session", {})
+        if session:
+            lines.append("Referências de sessão disponíveis: token={}, carrinho={}".format(
+                "sim" if session.get("token") else "não",
+                session.get("basket_id", "não")))
     return "\n".join(lines)
 
 
@@ -329,7 +379,15 @@ PROPOSAL_SYSTEM = (
     "Ferramentas disponíveis:\n{tools}\n"
     "Reaproveite evidências dos passos anteriores (por exemplo, um token Bearer ou um id "
     "obtido numa resposta) nos headers ou no path da próxima ação. "
-    "Você NÃO executa nada; a dupla decide. Baseie a próxima ação nos resultados anteriores."
+    "Você NÃO executa nada; a dupla decide. Baseie a próxima ação nos resultados anteriores. "
+    "Mantenha os parâmetros mínimos e completos: não invente tokens, não use placeholders "
+    "e não replique listas inteiras de dados quando um único item já observado basta. "
+    "Se o histórico não contém um token Bearer real obtido numa execução anterior, omita "
+    "headers por completo: nunca escreva Authorization, Bearer ou <token>. "
+    "Não responda com observações, next_action ou texto explicativo; responda somente no esquema "
+    "rationale/tool/params exigido. Quando o histórico disser que há referências de sessão, "
+    "use exatamente Authorization:'Bearer $last_token' e/ou $last_basket_id no path; "
+    "elas são resolvidas internamente apenas depois de autorização humana. Nunca copie token bruto."
 )
 
 INTERPRET_SYSTEM = (
@@ -423,12 +481,14 @@ def run(objective, investigation, max_steps):
     print("Objetivo: {}".format(objective))
 
     history, step = [], 0
+    session = {}
+    repair_note = ""
     while step < max_steps:
         step += 1
         # 1) Proposta do modelo ------------------------------------------------
         system = PROPOSAL_SYSTEM.format(target=TARGET, tools=tool_catalog())
-        prompt = "Objetivo: {}\n\nHistórico:\n{}\n\nProponha a próxima ação como JSON.".format(
-            objective, compact_history(history))
+        prompt = "Objetivo: {}\n\nHistórico:\n{}{}\n\nProponha a próxima ação como JSON.".format(
+            objective, compact_history(history), repair_note)
         try:
             raw = model_generate(system, prompt)
         except (urllib.error.URLError, RuntimeError, OSError) as exc:
@@ -448,8 +508,14 @@ def run(objective, investigation, max_steps):
             print("  Resposta bruta: {}".format(raw[:400]))
             if ask("  [r]epetir  [e]ncerrar > ").lower().startswith("e"):
                 break
+            repair_note = (
+                "\n\nA resposta anterior foi inválida e NÃO foi executada: {}"
+                "\nAgora responda somente com o objeto JSON exigido, incluindo "
+                '"tool":"http_request" ou "tool":"tcp_scan" e "params".'
+            ).format(raw[:MODEL_PREVIEW])
             step -= 1
             continue
+        repair_note = ""
         log.event(step, "proposta", tool=proposal["tool"],
                   params=proposal.get("params", {}), rationale=proposal.get("rationale", ""))
 
@@ -477,10 +543,13 @@ def run(objective, investigation, max_steps):
 
         # 3) Execução (só do que foi autorizado) ------------------------------
         try:
-            result = TOOLS[proposal["tool"]]["run"](final_params)
+            execution_params, resolved_refs = resolve_session_references(final_params, session)
+            validate_tool_params(proposal["tool"], execution_params)
+            result = TOOLS[proposal["tool"]]["run"](execution_params)
             status = "ok"
             log.event(step, "execucao", tool=proposal["tool"], final_params=final_params,
-                      status=status, result=result)
+                      resolved_references=resolved_refs, status=status, result=result)
+            session.update(capture_session_values(result))
         except (ValueError, RuntimeError, OSError) as exc:
             status = "erro"
             result = {"error": str(exc)}
@@ -523,7 +592,7 @@ def run(objective, investigation, max_steps):
         history.append({"step": step, "tool": proposal["tool"], "params": final_params,
                         "decision": decision, "status": status,
                         "interpretation": interpretation, "evidence": preview,
-                        "human_evaluation": evaluation})
+                        "human_evaluation": evaluation, "session": dict(session)})
         if not cont.startswith("s"):
             print("Investigação encerrada pela dupla.")
             break
